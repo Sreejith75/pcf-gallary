@@ -1,0 +1,15 @@
+/Users/sreejith.k/Code/Custom-PCF-Gallary/pcf-gallary/src/AppWeaver.AIBrain/obj/Debug/net8.0/AppWeaver.AIBrain.csproj.AssemblyReference.cache
+/Users/sreejith.k/Code/Custom-PCF-Gallary/pcf-gallary/src/AppWeaver.AIBrain/obj/Debug/net8.0/AppWeaver.AIBrain.GeneratedMSBuildEditorConfig.editorconfig
+/Users/sreejith.k/Code/Custom-PCF-Gallary/pcf-gallary/src/AppWeaver.AIBrain/obj/Debug/net8.0/AppWeaver.AIBrain.AssemblyInfoInputs.cache
+/Users/sreejith.k/Code/Custom-PCF-Gallary/pcf-gallary/src/AppWeaver.AIBrain/obj/Debug/net8.0/AppWeaver.AIBrain.AssemblyInfo.cs
+/Users/sreejith.k/Code/Custom-PCF-Gallary/pcf-gallary/src/AppWeaver.AIBrain/obj/Debug/net8.0/AppWeaver.AIBrain.csproj.CoreCompileInputs.cache
+/Users/sreejith.k/Code/Custom-PCF-Gallary/pcf-gallary/src/AppWeaver.AIBrain/obj/Debug/net8.0/AppWeaver.AIBrain.sourcelink.json
+/Users/sreejith.k/Code/Custom-PCF-Gallary/pcf-gallary/src/AppWeaver.AIBrain/bin/Debug/net8.0/AppWeaver.AIBrain.deps.json
+/Users/sreejith.k/Code/Custom-PCF-Gallary/pcf-gallary/src/AppWeaver.AIBrain/bin/Debug/net8.0/AppWeaver.AIBrain.dll
+/Users/sreejith.k/Code/Custom-PCF-Gallary/pcf-gallary/src/AppWeaver.AIBrain/bin/Debug/net8.0/AppWeaver.AIBrain.pdb
+/Users/sreejith.k/Code/Custom-PCF-Gallary/pcf-gallary/src/AppWeaver.AIBrain/bin/Debug/net8.0/AppWeaver.AIBrain.xml
+/Users/sreejith.k/Code/Custom-PCF-Gallary/pcf-gallary/src/AppWeaver.AIBrain/obj/Debug/net8.0/AppWeaver.AIBrain.dll
+/Users/sreejith.k/Code/Custom-PCF-Gallary/pcf-gallary/src/AppWeaver.AIBrain/obj/Debug/net8.0/refint/AppWeaver.AIBrain.dll
+/Users/sreejith.k/Code/Custom-PCF-Gallary/pcf-gallary/src/AppWeaver.AIBrain/obj/Debug/net8.0/AppWeaver.AIBrain.xml
+/Users/sreejith.k/Code/Custom-PCF-Gallary/pcf-gallary/src/AppWeaver.AIBrain/obj/Debug/net8.0/AppWeaver.AIBrain.pdb
+/Users/sreejith.k/Code/Custom-PCF-Gallary/pcf-gallary/src/AppWeaver.AIBrain/obj/Debug/net8.0/ref/AppWeaver.AIBrain.dll
