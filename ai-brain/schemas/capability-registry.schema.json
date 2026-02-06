@@ -1,0 +1,163 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "https://pcf-ai-brain/schemas/capability-registry.schema.json",
+    "title": "Capability Registry Schema",
+    "description": "Structure for defining component capabilities with explicit limits",
+    "type": "object",
+    "required": [
+        "capabilityId",
+        "componentType",
+        "supportedFeatures",
+        "limits",
+        "forbidden"
+    ],
+    "properties": {
+        "capabilityId": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9-]*$",
+            "description": "Unique capability identifier"
+        },
+        "componentType": {
+            "type": "string",
+            "description": "Human-readable component type"
+        },
+        "description": {
+            "type": "string",
+            "maxLength": 500
+        },
+        "supportedFeatures": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "required": [
+                    "featureId",
+                    "name",
+                    "required"
+                ],
+                "properties": {
+                    "featureId": {
+                        "type": "string"
+                    },
+                    "name": {
+                        "type": "string"
+                    },
+                    "description": {
+                        "type": "string"
+                    },
+                    "required": {
+                        "type": "boolean"
+                    },
+                    "configurable": {
+                        "type": "boolean",
+                        "default": false
+                    },
+                    "parameters": {
+                        "type": "object",
+                        "description": "Feature-specific configuration parameters"
+                    }
+                }
+            }
+        },
+        "limits": {
+            "type": "object",
+            "description": "Explicit boundaries for component behavior",
+            "properties": {
+                "maxItems": {
+                    "type": "integer",
+                    "description": "Maximum number of items (e.g., stars in rating)"
+                },
+                "minItems": {
+                    "type": "integer"
+                },
+                "maxFileSize": {
+                    "type": "integer",
+                    "description": "Maximum file size in bytes"
+                },
+                "allowedFormats": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "performanceBudget": {
+                    "type": "object",
+                    "properties": {
+                        "maxRenderTimeMs": {
+                            "type": "integer"
+                        },
+                        "maxMemoryMb": {
+                            "type": "integer"
+                        }
+                    }
+                }
+            }
+        },
+        "forbidden": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "required": [
+                    "behavior",
+                    "reason"
+                ],
+                "properties": {
+                    "behavior": {
+                        "type": "string",
+                        "description": "Explicitly forbidden behavior"
+                    },
+                    "reason": {
+                        "type": "string",
+                        "description": "Why this is forbidden"
+                    },
+                    "alternative": {
+                        "type": "string",
+                        "description": "Recommended alternative approach"
+                    }
+                }
+            },
+            "description": "Behaviors that must never be implemented"
+        },
+        "dependencies": {
+            "type": "object",
+            "properties": {
+                "pcfVersion": {
+                    "type": "string"
+                },
+                "externalLibraries": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "name": {
+                                "type": "string"
+                            },
+                            "version": {
+                                "type": "string"
+                            },
+                            "justification": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "examples": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "scenario": {
+                        "type": "string"
+                    },
+                    "userInput": {
+                        "type": "string"
+                    },
+                    "expectedIntent": {
+                        "type": "object"
+                    }
+                }
+            }
+        }
+    }
+}

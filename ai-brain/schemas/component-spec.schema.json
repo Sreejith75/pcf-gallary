@@ -1,0 +1,181 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "https://pcf-ai-brain/schemas/component-spec.schema.json",
+    "title": "Component Specification Schema",
+    "description": "Normalized specification for a PCF component after intent resolution",
+    "type": "object",
+    "required": [
+        "componentId",
+        "componentName",
+        "namespace",
+        "capabilities",
+        "properties",
+        "resources"
+    ],
+    "properties": {
+        "componentId": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9-]*$",
+            "description": "Unique identifier in kebab-case"
+        },
+        "componentName": {
+            "type": "string",
+            "pattern": "^[A-Z][A-Za-z0-9]*$",
+            "description": "PascalCase component name"
+        },
+        "namespace": {
+            "type": "string",
+            "pattern": "^[A-Z][A-Za-z0-9]*$",
+            "description": "Publisher namespace"
+        },
+        "displayName": {
+            "type": "string",
+            "maxLength": 100
+        },
+        "description": {
+            "type": "string",
+            "maxLength": 500
+        },
+        "capabilities": {
+            "type": "object",
+            "required": [
+                "capabilityId",
+                "features"
+            ],
+            "properties": {
+                "capabilityId": {
+                    "type": "string",
+                    "description": "Reference to capability registry entry"
+                },
+                "features": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "description": "Enabled features from capability definition"
+                },
+                "customizations": {
+                    "type": "object",
+                    "description": "Feature-specific customizations within allowed bounds"
+                }
+            }
+        },
+        "properties": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "required": [
+                    "name",
+                    "displayName",
+                    "dataType",
+                    "usage"
+                ],
+                "properties": {
+                    "name": {
+                        "type": "string",
+                        "pattern": "^[a-z][a-zA-Z0-9]*$"
+                    },
+                    "displayName": {
+                        "type": "string"
+                    },
+                    "dataType": {
+                        "type": "string",
+                        "enum": [
+                            "SingleLine.Text",
+                            "Multiple",
+                            "Whole.None",
+                            "Decimal",
+                            "TwoOptions",
+                            "DateAndTime.DateOnly",
+                            "DateAndTime.DateAndTime",
+                            "Currency",
+                            "Lookup.Simple",
+                            "OptionSet",
+                            "MultiSelectOptionSet"
+                        ]
+                    },
+                    "usage": {
+                        "type": "string",
+                        "enum": [
+                            "bound",
+                            "input",
+                            "output"
+                        ]
+                    },
+                    "required": {
+                        "type": "boolean",
+                        "default": false
+                    },
+                    "description": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "resources": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "string",
+                    "description": "Path to TypeScript implementation file"
+                },
+                "css": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "description": "CSS resource files"
+                },
+                "resx": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "description": "Localization resource files"
+                },
+                "img": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "description": "Image assets"
+                }
+            }
+        },
+        "validation": {
+            "type": "object",
+            "properties": {
+                "rulesApplied": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "description": "List of rule files applied during validation"
+                },
+                "warnings": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "downgrades": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "feature": {
+                                "type": "string"
+                            },
+                            "reason": {
+                                "type": "string"
+                            },
+                            "alternative": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

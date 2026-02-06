@@ -1,0 +1,127 @@
+{
+    "version": "1.0.0",
+    "description": "Test cases that should be rejected with clear error messages",
+    "testCases": [
+        {
+            "id": "REJECT_001",
+            "name": "Unsupported component type",
+            "userInput": "Create a video player component",
+            "expectedOutcome": "rejected",
+            "expectedError": {
+                "stage": "capability-matching",
+                "reason": "No capability supports video playback functionality",
+                "userMessage": "Video player components are not currently supported.",
+                "suggestions": [
+                    "Use PowerApps built-in media controls for video playback"
+                ]
+            }
+        },
+        {
+            "id": "REJECT_002",
+            "name": "Forbidden behavior requested",
+            "userInput": "Rating control that auto-submits to external API",
+            "expectedOutcome": "rejected",
+            "expectedError": {
+                "stage": "capability-matching",
+                "reason": "External API calls are explicitly forbidden in star-rating capability",
+                "userMessage": "PCF components cannot make direct external API calls. They must work offline and use Dataverse for data operations.",
+                "alternative": "Use PCF data binding to update Dataverse fields, then use Power Automate for external integrations"
+            }
+        },
+        {
+            "id": "REJECT_003",
+            "name": "Invalid component name",
+            "userInput": "Create component named '123-rating'",
+            "expectedOutcome": "rejected",
+            "expectedError": {
+                "stage": "specification-generation",
+                "reason": "Component name must start with a letter (PCF_NAMING_001)",
+                "userMessage": "Component names must be valid TypeScript class names starting with a letter.",
+                "suggestion": "Use 'Rating123' or 'ThreeStarRating' instead"
+            }
+        },
+        {
+            "id": "REJECT_004",
+            "name": "No matching capability",
+            "userInput": "I need a blockchain validator",
+            "expectedOutcome": "rejected",
+            "expectedError": {
+                "stage": "capability-matching",
+                "reason": "No capability matches the intent",
+                "userMessage": "Cannot generate a component for this request. No matching capability found.",
+                "availableCapabilities": [
+                    "star-rating"
+                ]
+            }
+        },
+        {
+            "id": "REJECT_005",
+            "name": "Forbidden animation duration",
+            "userInput": "Rating with 2-second star animation",
+            "expectedOutcome": "rejected",
+            "expectedError": {
+                "stage": "capability-matching",
+                "reason": "Animation duration exceeds 500ms limit (forbidden behavior)",
+                "userMessage": "Star animations cannot exceed 500ms due to performance requirements.",
+                "alternative": "Use CSS transitions limited to 200-300ms for optimal user experience"
+            }
+        },
+        {
+            "id": "REJECT_006",
+            "name": "CDN dependency requested",
+            "userInput": "Rating using Font Awesome icons from CDN",
+            "expectedOutcome": "rejected",
+            "expectedError": {
+                "stage": "capability-matching",
+                "reason": "External CDN dependencies are forbidden (security and offline requirements)",
+                "userMessage": "PCF components cannot load resources from external CDNs.",
+                "alternative": "Use inline SVG or bundle icon resources with the component"
+            }
+        },
+        {
+            "id": "REJECT_007",
+            "name": "Completely ambiguous input",
+            "userInput": "make something",
+            "expectedOutcome": "rejected",
+            "expectedError": {
+                "stage": "intent-interpretation",
+                "reason": "Cannot determine component type from input",
+                "userMessage": "Please provide more details about what type of component you need.",
+                "clarificationNeeded": "What should this component do? (e.g., collect ratings, display data, allow selection)"
+            }
+        },
+        {
+            "id": "REJECT_008",
+            "name": "Contradictory requirements",
+            "userInput": "Read-only editable rating control",
+            "expectedOutcome": "rejected",
+            "expectedError": {
+                "stage": "intent-interpretation",
+                "reason": "Conflicting interactivity requirements: cannot be both read-only and editable",
+                "clarificationNeeded": "Should this control be editable by users or display-only?"
+            }
+        },
+        {
+            "id": "REJECT_009",
+            "name": "Security violation",
+            "userInput": "Rating that executes custom JavaScript from user input",
+            "expectedOutcome": "rejected",
+            "expectedError": {
+                "stage": "rules-validation",
+                "reason": "Security rule violation: eval() and dynamic code execution forbidden (PCF_SECURITY_002)",
+                "userMessage": "Components cannot execute arbitrary code due to Content Security Policy requirements."
+            }
+        },
+        {
+            "id": "REJECT_010",
+            "name": "Accessibility violation",
+            "userInput": "Rating control with no keyboard support",
+            "expectedOutcome": "rejected",
+            "expectedError": {
+                "stage": "rules-validation",
+                "reason": "Accessibility rule violation: keyboard navigation required (PCF_A11Y_001)",
+                "userMessage": "All interactive PCF components must support keyboard navigation per WCAG 2.1 Level A requirements."
+            }
+        }
+    ]
+}

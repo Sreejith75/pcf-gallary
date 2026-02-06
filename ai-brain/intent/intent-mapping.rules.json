@@ -1,0 +1,160 @@
+{
+    "version": "1.0.0",
+    "description": "Maps natural language patterns to canonical intent classifications",
+    "mappings": [
+        {
+            "patterns": [
+                "rating",
+                "rate",
+                "stars",
+                "review score",
+                "feedback score"
+            ],
+            "intent": {
+                "classification": "input-control",
+                "uiIntent": {
+                    "primaryPurpose": "collect-rating"
+                }
+            },
+            "confidence": "high",
+            "capabilityHint": "star-rating"
+        },
+        {
+            "patterns": [
+                "text input",
+                "text box",
+                "enter text",
+                "type in"
+            ],
+            "intent": {
+                "classification": "input-control",
+                "uiIntent": {
+                    "primaryPurpose": "collect-text"
+                }
+            },
+            "confidence": "high"
+        },
+        {
+            "patterns": [
+                "number",
+                "numeric",
+                "quantity",
+                "amount"
+            ],
+            "intent": {
+                "classification": "input-control",
+                "uiIntent": {
+                    "primaryPurpose": "collect-number"
+                }
+            },
+            "confidence": "medium"
+        },
+        {
+            "patterns": [
+                "date",
+                "calendar",
+                "pick a date",
+                "select date"
+            ],
+            "intent": {
+                "classification": "input-control",
+                "uiIntent": {
+                    "primaryPurpose": "collect-date"
+                }
+            },
+            "confidence": "high"
+        },
+        {
+            "patterns": [
+                "dropdown",
+                "select",
+                "choose from",
+                "pick one",
+                "options"
+            ],
+            "intent": {
+                "classification": "input-control",
+                "uiIntent": {
+                    "primaryPurpose": "collect-choice"
+                }
+            },
+            "confidence": "high"
+        },
+        {
+            "patterns": [
+                "display",
+                "show",
+                "view",
+                "read-only"
+            ],
+            "intent": {
+                "classification": "display-control",
+                "uiIntent": {
+                    "primaryPurpose": "display-value"
+                }
+            },
+            "confidence": "medium"
+        }
+    ],
+    "modifiers": {
+        "readOnly": {
+            "patterns": [
+                "read-only",
+                "display only",
+                "can't edit",
+                "view only",
+                "disabled"
+            ],
+            "applies": {
+                "behavior.interactivity": "read-only"
+            }
+        },
+        "required": {
+            "patterns": [
+                "required",
+                "mandatory",
+                "must provide",
+                "cannot be empty"
+            ],
+            "applies": {
+                "behavior.validation": "required"
+            }
+        },
+        "minimal": {
+            "patterns": [
+                "simple",
+                "basic",
+                "minimal",
+                "plain"
+            ],
+            "applies": {
+                "uiIntent.visualStyle": "minimal"
+            }
+        },
+        "rich": {
+            "patterns": [
+                "rich",
+                "fancy",
+                "styled",
+                "custom design"
+            ],
+            "applies": {
+                "uiIntent.visualStyle": "rich"
+            }
+        }
+    },
+    "contextualRules": [
+        {
+            "rule": "If 'display' or 'show' is used with a rating-related term, classify as display-control with read-only behavior",
+            "example": "show average rating"
+        },
+        {
+            "rule": "If 'collect', 'enter', or 'input' is used, default to editable interactivity",
+            "example": "collect user rating"
+        },
+        {
+            "rule": "If no interactivity modifier is specified for input-control, default to editable",
+            "example": "rating control"
+        }
+    ]
+}

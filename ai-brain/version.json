@@ -1,0 +1,26 @@
+{
+  "version": "1.0.0",
+  "released": "2026-02-06",
+  "schemaVersion": "1.0",
+  "changelog": [
+    {
+      "version": "1.0.0",
+      "date": "2026-02-06",
+      "changes": [
+        "Initial AI Brain release",
+        "Global intent schema with component-agnostic classification",
+        "Star rating capability definition as reference implementation",
+        "Core PCF rules for compliance and safety",
+        "Component creation procedure with validation checkpoints",
+        "Thin prompts for intent interpretation and spec generation",
+        "Comprehensive test case coverage"
+      ]
+    }
+  ],
+  "compatibility": {
+    "minLLMContextWindow": 8192,
+    "recommendedLLMContextWindow": 32768,
+    "pcfCliVersion": "1.x",
+    "powerAppsVersion": "9.x"
+  }
+}

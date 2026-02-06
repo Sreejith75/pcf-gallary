@@ -1,0 +1,130 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "https://pcf-ai-brain/schemas/validation-rules.schema.json",
+    "title": "Validation Rules Schema",
+    "description": "Structure for defining validation and constraint rules",
+    "type": "object",
+    "required": [
+        "ruleId",
+        "category",
+        "severity",
+        "condition",
+        "action"
+    ],
+    "properties": {
+        "ruleId": {
+            "type": "string",
+            "pattern": "^[A-Z0-9_]+$",
+            "description": "Unique rule identifier in SCREAMING_SNAKE_CASE"
+        },
+        "category": {
+            "type": "string",
+            "enum": [
+                "pcf-compliance",
+                "performance",
+                "accessibility",
+                "security",
+                "best-practice"
+            ]
+        },
+        "severity": {
+            "type": "string",
+            "enum": [
+                "error",
+                "warning",
+                "info"
+            ],
+            "description": "error = reject, warning = downgrade, info = note"
+        },
+        "condition": {
+            "type": "object",
+            "required": [
+                "type"
+            ],
+            "properties": {
+                "type": {
+                    "type": "string",
+                    "enum": [
+                        "property-check",
+                        "capability-check",
+                        "resource-check",
+                        "dependency-check",
+                        "pattern-match"
+                    ]
+                },
+                "target": {
+                    "type": "string",
+                    "description": "What to validate (JSONPath or identifier)"
+                },
+                "operator": {
+                    "type": "string",
+                    "enum": [
+                        "equals",
+                        "not-equals",
+                        "contains",
+                        "not-contains",
+                        "greater-than",
+                        "less-than",
+                        "matches-regex",
+                        "exists",
+                        "not-exists"
+                    ]
+                },
+                "value": {
+                    "description": "Expected value for comparison"
+                }
+            }
+        },
+        "action": {
+            "type": "object",
+            "required": [
+                "type",
+                "message"
+            ],
+            "properties": {
+                "type": {
+                    "type": "string",
+                    "enum": [
+                        "reject",
+                        "downgrade",
+                        "warn",
+                        "auto-fix"
+                    ]
+                },
+                "message": {
+                    "type": "string",
+                    "description": "User-facing explanation"
+                },
+                "suggestion": {
+                    "type": "string",
+                    "description": "How to resolve the issue"
+                },
+                "autoFixValue": {
+                    "description": "Automatic correction value if type is auto-fix"
+                }
+            }
+        },
+        "scope": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            },
+            "description": "Which component types this rule applies to (empty = all)"
+        },
+        "documentation": {
+            "type": "object",
+            "properties": {
+                "rationale": {
+                    "type": "string"
+                },
+                "references": {
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                        "format": "uri"
+                    }
+                }
+            }
+        }
+    }
+}

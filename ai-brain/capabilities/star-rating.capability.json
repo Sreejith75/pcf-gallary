@@ -1,0 +1,185 @@
+{
+    "capabilityId": "star-rating",
+    "componentType": "Star Rating Control",
+    "description": "Interactive rating control that allows users to provide feedback using a star-based scale. Supports read-only display and editable input modes.",
+    "supportedFeatures": [
+        {
+            "featureId": "basic-rating",
+            "name": "Basic Star Rating",
+            "description": "Display and collect star ratings with configurable maximum stars",
+            "required": true,
+            "configurable": true,
+            "parameters": {
+                "maxStars": {
+                    "type": "integer",
+                    "min": 3,
+                    "max": 10,
+                    "default": 5
+                },
+                "allowHalfStars": {
+                    "type": "boolean",
+                    "default": false
+                }
+            }
+        },
+        {
+            "featureId": "visual-customization",
+            "name": "Visual Customization",
+            "description": "Customize star appearance and colors",
+            "required": false,
+            "configurable": true,
+            "parameters": {
+                "starSize": {
+                    "type": "string",
+                    "enum": [
+                        "small",
+                        "medium",
+                        "large"
+                    ],
+                    "default": "medium"
+                },
+                "filledColor": {
+                    "type": "string",
+                    "pattern": "^#[0-9A-Fa-f]{6}$",
+                    "default": "#FFD700"
+                },
+                "emptyColor": {
+                    "type": "string",
+                    "pattern": "^#[0-9A-Fa-f]{6}$",
+                    "default": "#D3D3D3"
+                }
+            }
+        },
+        {
+            "featureId": "read-only-mode",
+            "name": "Read-Only Display",
+            "description": "Display rating without allowing user interaction",
+            "required": true,
+            "configurable": true,
+            "parameters": {
+                "disabled": {
+                    "type": "boolean",
+                    "default": false
+                }
+            }
+        },
+        {
+            "featureId": "hover-preview",
+            "name": "Hover Preview",
+            "description": "Show preview of rating on hover before selection",
+            "required": false,
+            "configurable": true,
+            "parameters": {
+                "enabled": {
+                    "type": "boolean",
+                    "default": true
+                }
+            }
+        },
+        {
+            "featureId": "clear-rating",
+            "name": "Clear Rating",
+            "description": "Allow users to clear their rating selection",
+            "required": false,
+            "configurable": true,
+            "parameters": {
+                "showClearButton": {
+                    "type": "boolean",
+                    "default": false
+                }
+            }
+        }
+    ],
+    "limits": {
+        "maxItems": 10,
+        "minItems": 3,
+        "performanceBudget": {
+            "maxRenderTimeMs": 100,
+            "maxMemoryMb": 2
+        }
+    },
+    "forbidden": [
+        {
+            "behavior": "Animated star transitions exceeding 500ms",
+            "reason": "Performance impact on low-end devices and poor user experience",
+            "alternative": "Use CSS transitions limited to 200-300ms"
+        },
+        {
+            "behavior": "External API calls for rating submission",
+            "reason": "PCF components must work offline and cannot make direct external calls",
+            "alternative": "Use PCF data binding to update Dataverse fields"
+        },
+        {
+            "behavior": "Custom icon fonts loaded from CDN",
+            "reason": "Security and offline functionality requirements",
+            "alternative": "Use inline SVG or bundled icon resources"
+        },
+        {
+            "behavior": "More than 10 stars",
+            "reason": "Usability research shows diminished accuracy beyond 10 points",
+            "alternative": "Use 5-star or 10-star scale with half-star support if needed"
+        },
+        {
+            "behavior": "Auto-submit on rating change",
+            "reason": "Users must explicitly save form data in PowerApps",
+            "alternative": "Update bound field value; let PowerApps handle submission"
+        }
+    ],
+    "dependencies": {
+        "pcfVersion": "1.0.0",
+        "externalLibraries": []
+    },
+    "examples": [
+        {
+            "scenario": "Simple 5-star product rating",
+            "userInput": "I need a 5-star rating control for product reviews",
+            "expectedIntent": {
+                "classification": "input-control",
+                "uiIntent": {
+                    "primaryPurpose": "collect-rating",
+                    "visualStyle": "standard",
+                    "dataBinding": "single-value"
+                },
+                "behavior": {
+                    "interactivity": "editable",
+                    "validation": "optional",
+                    "persistence": "manual-save"
+                },
+                "interaction": {
+                    "inputMethod": [
+                        "click",
+                        "tap"
+                    ],
+                    "feedback": [
+                        "visual-highlight"
+                    ]
+                }
+            }
+        },
+        {
+            "scenario": "Read-only rating display",
+            "userInput": "Show average rating as stars, users shouldn't be able to change it",
+            "expectedIntent": {
+                "classification": "display-control",
+                "uiIntent": {
+                    "primaryPurpose": "display-value",
+                    "visualStyle": "standard",
+                    "dataBinding": "single-value"
+                },
+                "behavior": {
+                    "interactivity": "read-only",
+                    "validation": "none",
+                    "persistence": "transient"
+                },
+                "interaction": {
+                    "inputMethod": [
+                        "none"
+                    ],
+                    "feedback": [
+                        "none"
+                    ]
+                }
+            }
+        }
+    ]
+}

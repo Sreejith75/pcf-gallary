@@ -1,0 +1,217 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "$id": "https://pcf-ai-brain/schemas/global-intent.schema.json",
+    "title": "Global Intent Schema",
+    "description": "Component-agnostic user intent classification. Represents how users think, not how PCF works.",
+    "type": "object",
+    "required": [
+        "classification",
+        "uiIntent",
+        "interaction"
+    ],
+    "properties": {
+        "classification": {
+            "type": "string",
+            "enum": [
+                "input-control",
+                "display-control",
+                "data-visualization",
+                "navigation-control",
+                "media-control",
+                "container-control",
+                "utility-control"
+            ],
+            "description": "High-level component category"
+        },
+        "uiIntent": {
+            "type": "object",
+            "required": [
+                "primaryPurpose"
+            ],
+            "properties": {
+                "primaryPurpose": {
+                    "type": "string",
+                    "enum": [
+                        "collect-rating",
+                        "collect-text",
+                        "collect-number",
+                        "collect-date",
+                        "collect-choice",
+                        "collect-file",
+                        "display-value",
+                        "display-formatted-text",
+                        "display-image",
+                        "display-chart",
+                        "display-table",
+                        "trigger-action",
+                        "navigate",
+                        "organize-content"
+                    ]
+                },
+                "visualStyle": {
+                    "type": "string",
+                    "enum": [
+                        "minimal",
+                        "standard",
+                        "rich",
+                        "custom"
+                    ]
+                },
+                "dataBinding": {
+                    "type": "string",
+                    "enum": [
+                        "single-value",
+                        "multi-value",
+                        "dataset",
+                        "none"
+                    ]
+                }
+            }
+        },
+        "behavior": {
+            "type": "object",
+            "properties": {
+                "interactivity": {
+                    "type": "string",
+                    "enum": [
+                        "read-only",
+                        "editable",
+                        "interactive",
+                        "passive"
+                    ]
+                },
+                "validation": {
+                    "type": "string",
+                    "enum": [
+                        "required",
+                        "optional",
+                        "none"
+                    ]
+                },
+                "persistence": {
+                    "type": "string",
+                    "enum": [
+                        "auto-save",
+                        "manual-save",
+                        "transient"
+                    ]
+                }
+            }
+        },
+        "interaction": {
+            "type": "object",
+            "required": [
+                "inputMethod"
+            ],
+            "properties": {
+                "inputMethod": {
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                        "enum": [
+                            "click",
+                            "tap",
+                            "drag",
+                            "keyboard",
+                            "voice",
+                            "none"
+                        ]
+                    },
+                    "minItems": 1
+                },
+                "feedback": {
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                        "enum": [
+                            "visual-highlight",
+                            "animation",
+                            "sound",
+                            "haptic",
+                            "none"
+                        ]
+                    }
+                }
+            }
+        },
+        "accessibility": {
+            "type": "object",
+            "properties": {
+                "wcagLevel": {
+                    "type": "string",
+                    "enum": [
+                        "A",
+                        "AA",
+                        "AAA"
+                    ],
+                    "default": "AA"
+                },
+                "keyboardNavigable": {
+                    "type": "boolean",
+                    "default": true
+                },
+                "screenReaderSupport": {
+                    "type": "boolean",
+                    "default": true
+                },
+                "highContrastMode": {
+                    "type": "boolean",
+                    "default": true
+                }
+            }
+        },
+        "responsiveness": {
+            "type": "object",
+            "properties": {
+                "adaptiveLayout": {
+                    "type": "boolean",
+                    "default": true
+                },
+                "minWidth": {
+                    "type": "integer",
+                    "minimum": 100
+                },
+                "maxWidth": {
+                    "type": "integer"
+                },
+                "aspectRatioLocked": {
+                    "type": "boolean",
+                    "default": false
+                }
+            }
+        },
+        "constraints": {
+            "type": "object",
+            "properties": {
+                "performanceTarget": {
+                    "type": "string",
+                    "enum": [
+                        "lightweight",
+                        "standard",
+                        "data-intensive"
+                    ],
+                    "default": "standard"
+                },
+                "offlineCapable": {
+                    "type": "boolean",
+                    "default": false
+                },
+                "externalDependencies": {
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                        "enum": [
+                            "none",
+                            "cdn-library",
+                            "web-api",
+                            "custom-font"
+                        ]
+                    },
+                    "default": [
+                        "none"
+                    ]
+                }
+            }
+        }
+    }
+}

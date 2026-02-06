@@ -1,0 +1,130 @@
+{
+    "version": "1.0.0",
+    "description": "Test cases for boundary conditions and unusual but valid inputs",
+    "testCases": [
+        {
+            "id": "EDGE_001",
+            "name": "Maximum star count at limit",
+            "userInput": "I need a rating control with 10 stars",
+            "expectedCapability": "star-rating",
+            "expectedOutcome": "success",
+            "expectedCustomizations": {
+                "maxStars": 10
+            },
+            "notes": "Tests upper limit of capability"
+        },
+        {
+            "id": "EDGE_002",
+            "name": "Minimum star count at limit",
+            "userInput": "Create a 3-star rating control",
+            "expectedCapability": "star-rating",
+            "expectedOutcome": "success",
+            "expectedCustomizations": {
+                "maxStars": 3
+            },
+            "notes": "Tests lower limit of capability"
+        },
+        {
+            "id": "EDGE_003",
+            "name": "Star count exceeds maximum",
+            "userInput": "I want a 15-star rating system",
+            "expectedCapability": "star-rating",
+            "expectedOutcome": "success-with-downgrade",
+            "expectedCustomizations": {
+                "maxStars": 10
+            },
+            "expectedDowngrades": [
+                {
+                    "feature": "maxStars",
+                    "requestedValue": 15,
+                    "appliedValue": 10,
+                    "reason": "Requested value exceeds capability maximum of 10"
+                }
+            ],
+            "notes": "Should clamp to maximum and document downgrade"
+        },
+        {
+            "id": "EDGE_004",
+            "name": "Star count below minimum",
+            "userInput": "2-star rating control",
+            "expectedCapability": "star-rating",
+            "expectedOutcome": "success-with-downgrade",
+            "expectedCustomizations": {
+                "maxStars": 3
+            },
+            "expectedDowngrades": [
+                {
+                    "feature": "maxStars",
+                    "requestedValue": 2,
+                    "appliedValue": 3,
+                    "reason": "Requested value below capability minimum of 3"
+                }
+            ]
+        },
+        {
+            "id": "EDGE_005",
+            "name": "Vague description with defaults",
+            "userInput": "rating thing",
+            "expectedCapability": "star-rating",
+            "expectedOutcome": "success",
+            "expectedCustomizations": {
+                "maxStars": 5
+            },
+            "notes": "Should apply all default assumptions"
+        },
+        {
+            "id": "EDGE_006",
+            "name": "Both editable and read-only mentioned",
+            "userInput": "Rating control that users can see but also edit",
+            "expectedOutcome": "clarification-needed",
+            "clarificationQuestion": "Should this control be editable by users or display-only?",
+            "notes": "Conflicting interactivity requirements"
+        },
+        {
+            "id": "EDGE_007",
+            "name": "Multiple visual style modifiers",
+            "userInput": "Simple but fancy rating control",
+            "expectedIntent": {
+                "uiIntent": {
+                    "visualStyle": "standard"
+                }
+            },
+            "expectedOutcome": "success",
+            "notes": "Conflicting style modifiers should resolve to standard"
+        },
+        {
+            "id": "EDGE_008",
+            "name": "Accessibility level explicitly specified",
+            "userInput": "AAA compliant rating control",
+            "expectedIntent": {
+                "accessibility": {
+                    "wcagLevel": "AAA"
+                }
+            },
+            "expectedOutcome": "success",
+            "notes": "Should honor explicit WCAG level"
+        },
+        {
+            "id": "EDGE_009",
+            "name": "Half-star support requested",
+            "userInput": "Rating with half stars",
+            "expectedCapability": "star-rating",
+            "expectedOutcome": "success",
+            "expectedCustomizations": {
+                "allowHalfStars": true
+            },
+            "notes": "Optional feature from capability definition"
+        },
+        {
+            "id": "EDGE_010",
+            "name": "Custom colors specified",
+            "userInput": "Blue star rating control",
+            "expectedCapability": "star-rating",
+            "expectedOutcome": "success-with-warning",
+            "expectedWarnings": [
+                "Custom colors may not meet WCAG AA contrast requirements. Verify contrast ratio."
+            ],
+            "notes": "Should allow but warn about accessibility"
+        }
+    ]
+}

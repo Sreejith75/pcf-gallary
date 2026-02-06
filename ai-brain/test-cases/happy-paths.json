@@ -1,0 +1,110 @@
+{
+    "version": "1.0.0",
+    "description": "Test cases representing successful component generation scenarios",
+    "testCases": [
+        {
+            "id": "HAPPY_001",
+            "name": "Basic 5-star rating control",
+            "userInput": "I need a 5-star rating control for product reviews",
+            "expectedIntent": {
+                "classification": "input-control",
+                "uiIntent": {
+                    "primaryPurpose": "collect-rating",
+                    "visualStyle": "standard",
+                    "dataBinding": "single-value"
+                }
+            },
+            "expectedCapability": "star-rating",
+            "expectedOutcome": "success",
+            "expectedProperties": [
+                {
+                    "name": "value",
+                    "dataType": "Whole.None",
+                    "usage": "bound"
+                }
+            ]
+        },
+        {
+            "id": "HAPPY_002",
+            "name": "Read-only rating display",
+            "userInput": "Show average product rating as stars, users can't edit it",
+            "expectedIntent": {
+                "classification": "display-control",
+                "uiIntent": {
+                    "primaryPurpose": "display-value",
+                    "visualStyle": "standard",
+                    "dataBinding": "single-value"
+                },
+                "behavior": {
+                    "interactivity": "read-only"
+                }
+            },
+            "expectedCapability": "star-rating",
+            "expectedOutcome": "success",
+            "expectedProperties": [
+                {
+                    "name": "value",
+                    "dataType": "Whole.None",
+                    "usage": "bound"
+                },
+                {
+                    "name": "disabled",
+                    "dataType": "TwoOptions",
+                    "usage": "input"
+                }
+            ]
+        },
+        {
+            "id": "HAPPY_003",
+            "name": "Custom star count",
+            "userInput": "Create a 10-star rating control",
+            "expectedIntent": {
+                "classification": "input-control",
+                "uiIntent": {
+                    "primaryPurpose": "collect-rating"
+                }
+            },
+            "expectedCapability": "star-rating",
+            "expectedOutcome": "success",
+            "expectedCustomizations": {
+                "maxStars": 10
+            }
+        },
+        {
+            "id": "HAPPY_004",
+            "name": "Minimal style rating",
+            "userInput": "Simple rating control, nothing fancy",
+            "expectedIntent": {
+                "classification": "input-control",
+                "uiIntent": {
+                    "primaryPurpose": "collect-rating",
+                    "visualStyle": "minimal"
+                }
+            },
+            "expectedCapability": "star-rating",
+            "expectedOutcome": "success"
+        },
+        {
+            "id": "HAPPY_005",
+            "name": "Required rating field",
+            "userInput": "Rating control that's required before submission",
+            "expectedIntent": {
+                "classification": "input-control",
+                "uiIntent": {
+                    "primaryPurpose": "collect-rating"
+                },
+                "behavior": {
+                    "validation": "required"
+                }
+            },
+            "expectedCapability": "star-rating",
+            "expectedOutcome": "success",
+            "expectedProperties": [
+                {
+                    "name": "value",
+                    "required": true
+                }
+            ]
+        }
+    ]
+}

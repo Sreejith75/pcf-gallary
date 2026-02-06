@@ -1,0 +1,96 @@
+{
+    "version": "1.0.0",
+    "description": "Rules for handling unclear or conflicting user requests",
+    "resolutionStrategies": [
+        {
+            "scenario": "Multiple capability matches with equal confidence",
+            "strategy": "prefer-simpler",
+            "description": "Choose the capability with fewer dependencies and lower complexity",
+            "example": "If both 'star-rating' and 'slider-rating' match, prefer star-rating as it's more common"
+        },
+        {
+            "scenario": "Conflicting interactivity requirements",
+            "strategy": "reject-with-clarification",
+            "description": "Cannot be both read-only and editable",
+            "clarificationPrompt": "Should this control be editable by users or display-only?"
+        },
+        {
+            "scenario": "Vague visual style description",
+            "strategy": "default-to-standard",
+            "description": "Use standard visual style when not explicitly specified",
+            "fallback": "standard"
+        },
+        {
+            "scenario": "Unsupported feature request",
+            "strategy": "downgrade-with-notification",
+            "description": "Remove unsupported features and notify user of changes",
+            "action": "Generate spec without unsupported features and document in validation.downgrades"
+        },
+        {
+            "scenario": "No matching capability found",
+            "strategy": "reject-with-alternatives",
+            "description": "Cannot generate component without matching capability",
+            "action": "Return error with list of available capabilities and closest matches"
+        }
+    ],
+    "disambiguationQuestions": [
+        {
+            "trigger": "Multiple primaryPurpose candidates",
+            "question": "What is the main purpose of this control?",
+            "options": "List matched primaryPurpose values"
+        },
+        {
+            "trigger": "Unclear data binding requirement",
+            "question": "Will this control work with a single value, multiple values, or a dataset?",
+            "options": [
+                "single-value",
+                "multi-value",
+                "dataset"
+            ]
+        },
+        {
+            "trigger": "Accessibility level not specified",
+            "question": "What WCAG compliance level is required?",
+            "options": [
+                "A",
+                "AA",
+                "AAA"
+            ],
+            "default": "AA"
+        }
+    ],
+    "conflictResolution": [
+        {
+            "conflict": "User requests feature explicitly forbidden in capability",
+            "resolution": "reject",
+            "message": "The requested feature '{feature}' is not supported because: {reason}. Alternative: {alternative}"
+        },
+        {
+            "conflict": "User requests value exceeding capability limits",
+            "resolution": "clamp-to-limit",
+            "message": "Requested value {requestedValue} exceeds maximum {maxValue}. Using maximum allowed value.",
+            "example": "User requests 15 stars, capability max is 10, use 10"
+        },
+        {
+            "conflict": "User description matches multiple classifications",
+            "resolution": "prefer-input-over-display",
+            "rationale": "Input controls are more commonly requested in PCF scenarios"
+        }
+    ],
+    "defaultAssumptions": {
+        "accessibility.wcagLevel": "AA",
+        "accessibility.keyboardNavigable": true,
+        "accessibility.screenReaderSupport": true,
+        "accessibility.highContrastMode": true,
+        "responsiveness.adaptiveLayout": true,
+        "constraints.performanceTarget": "standard",
+        "constraints.offlineCapable": false,
+        "constraints.externalDependencies": [
+            "none"
+        ],
+        "uiIntent.visualStyle": "standard",
+        "behavior.interactivity": "editable",
+        "behavior.validation": "optional",
+        "behavior.persistence": "manual-save"
+    }
+}

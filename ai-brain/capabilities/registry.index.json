@@ -1,0 +1,55 @@
+{
+    "version": "1.0.0",
+    "lastUpdated": "2026-02-06",
+    "capabilities": [
+        {
+            "capabilityId": "star-rating",
+            "componentType": "Star Rating Control",
+            "file": "star-rating.capability.json",
+            "status": "stable",
+            "tags": [
+                "input",
+                "rating",
+                "feedback",
+                "interactive"
+            ]
+        }
+    ],
+    "index": {
+        "byClassification": {
+            "input-control": [
+                "star-rating"
+            ],
+            "display-control": [],
+            "data-visualization": [],
+            "navigation-control": [],
+            "media-control": [],
+            "container-control": [],
+            "utility-control": []
+        },
+        "byPrimaryPurpose": {
+            "collect-rating": [
+                "star-rating"
+            ],
+            "collect-text": [],
+            "collect-number": [],
+            "collect-date": [],
+            "collect-choice": [],
+            "collect-file": [],
+            "display-value": [],
+            "display-formatted-text": [],
+            "display-image": [],
+            "display-chart": [],
+            "display-table": [],
+            "trigger-action": [],
+            "navigate": [],
+            "organize-content": []
+        }
+    },
+    "metadata": {
+        "totalCapabilities": 1,
+        "stableCapabilities": 1,
+        "betaCapabilities": 0,
+        "deprecatedCapabilities": 0
+    }
+}
