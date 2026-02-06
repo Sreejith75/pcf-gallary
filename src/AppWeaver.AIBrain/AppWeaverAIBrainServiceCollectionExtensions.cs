@@ -42,6 +42,9 @@ public static class AppWeaverAIBrainServiceCollectionExtensions
         // Register procedures
         services.AddScoped<IProcedureExecutor, CreateComponentProcedure>();
 
+        // Register intent interpreter
+        services.AddScoped<Intent.IIntentInterpreter, Intent.IntentInterpreter>();
+
         return services;
     }
 

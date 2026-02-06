@@ -1,70 +1,50 @@
 using AppWeaver.AIBrain.Models.Intent;
-using AppWeaver.AIBrain.Models.Capabilities;
 
-namespace AppWeaver.AIBrain.Abstractions;
+namespace AppWeaver.AIBrain.Intent;
 
 /// <summary>
-/// Interprets natural language prompts into structured GlobalIntent.
-/// This is a pure validation and mapping layer - no LLM calls.
+/// Interface for intent interpretation.
+/// This is the single authority for translating user text into GlobalIntent.
 /// </summary>
 public interface IIntentInterpreter
 {
     /// <summary>
-    /// Validates a GlobalIntent object against the schema and intent rules.
+    /// Interprets raw user text into a validated GlobalIntent.
     /// </summary>
-    /// <param name="intent">The intent to validate</param>
+    /// <param name="rawUserText">The user's natural language input</param>
     /// <param name="cancellationToken">Cancellation token</param>
-    /// <returns>Validation result with any errors or warnings</returns>
-    Task<IntentValidationResult> ValidateIntentAsync(
-        GlobalIntent intent,
+    /// <returns>Intent interpretation result</returns>
+    /// <exception cref="IntentInterpreterExecutionException">If Node.js execution fails</exception>
+    /// <exception cref="IntentValidationException">If validation fails</exception>
+    Task<IntentInterpretationResult> InterpretAsync(
+        string rawUserText,
         CancellationToken cancellationToken = default);
-
-    /// <summary>
-    /// Checks if a GlobalIntent is ambiguous and requires clarification.
-    /// </summary>
-    /// <param name="intent">The intent to check</param>
-    /// <returns>Ambiguity result with clarification questions if needed</returns>
-    Task<AmbiguityCheckResult> CheckAmbiguityAsync(GlobalIntent intent);
 }
 
 /// <summary>
-/// Result of intent validation.
+/// Result of intent interpretation.
 /// </summary>
-public record IntentValidationResult
+public sealed class IntentInterpretationResult
 {
     /// <summary>
-    /// Whether the intent is valid.
+    /// The validated GlobalIntent.
+    /// NULL if needsClarification is true.
     /// </summary>
-    public required bool IsValid { get; init; }
+    public GlobalIntent? Intent { get; init; }
 
     /// <summary>
-    /// Validation errors, if any.
+    /// Confidence score from LLM (0.0 - 1.0).
     /// </summary>
-    public required IReadOnlyList<string> Errors { get; init; }
+    public double Confidence { get; init; }
 
     /// <summary>
-    /// Validation warnings, if any.
+    /// Phrases that could not be mapped to the schema.
     /// </summary>
-    public required IReadOnlyList<string> Warnings { get; init; }
-}
-
-/// <summary>
-/// Result of ambiguity checking.
-/// </summary>
-public record AmbiguityCheckResult
-{
-    /// <summary>
-    /// Whether the intent is ambiguous.
-    /// </summary>
-    public required bool IsAmbiguous { get; init; }
+    public required IReadOnlyList<string> UnmappedPhrases { get; init; }
 
     /// <summary>
-    /// Clarification question to ask the user, if ambiguous.
+    /// Whether clarification is needed from the user.
+    /// TRUE if confidence &lt; 0.6 or intent is ambiguous.
     /// </summary>
-    public string? ClarificationNeeded { get; init; }
-
-    /// <summary>
-    /// Possible options for the user to choose from.
-    /// </summary>
-    public IReadOnlyList<string>? Options { get; init; }
+    public bool NeedsClarification { get; init; }
 }

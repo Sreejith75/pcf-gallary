@@ -137,3 +137,19 @@ dist
 # Vite logs files
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+
+# .NET
+[Bb]in/
+[Oo]bj/
+*.user
+*.suo
+*.tmp
+*.log
+packages/
+TestResults/
+*.nupkg
+*.snupkg
+*.vsix
+.vs/
+.vscode/settings.json
+*.sln.cache
