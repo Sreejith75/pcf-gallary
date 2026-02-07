@@ -1,0 +1,6 @@
+@AppWeaver.AIBrain.Api_HostAddress = http://localhost:5122
+
+GET {{AppWeaver.AIBrain.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

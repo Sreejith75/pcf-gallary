@@ -1,0 +1,50 @@
+services:
+  appweaver-api:
+    build:
+      context: .
+      dockerfile: Dockerfile.api
+    container_name: appweaver-api
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://+:5000
+      # Override BrainPath to container mount
+      - BrainOptions__BrainRootPath=/app/ai-brain
+      # HTTP Executor Configuration
+      - EXECUTOR_URL=http://appweaver-executor:5001
+      # Pass through AI Keys (Mock or Real)
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - OPENAI_BASE_URL=${OPENAI_BASE_URL}
+      - XAI_API_KEY=${XAI_API_KEY}
+    ports:
+      - "5000:5000"
+    volumes:
+      - pcf-build-data:/tmp/pcf-build
+      - ./src/AppWeaver.AIBrain/ai-brain:/app/ai-brain:ro
+    networks:
+      - internal-net
+    depends_on:
+      - appweaver-executor
+
+  appweaver-executor:
+    build:
+      context: .
+      dockerfile: Dockerfile.executor
+    container_name: appweaver-executor
+    environment:
+      - PORT=5001
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - OPENAI_BASE_URL=${OPENAI_BASE_URL}
+      - XAI_API_KEY=${XAI_API_KEY}
+    volumes:
+      - pcf-build-data:/tmp/pcf-build
+      - ./src/AppWeaver.AIBrain/ai-brain:/app/ai-brain:ro
+    networks:
+      - internal-net
+
+volumes:
+  pcf-build-data:
+
+
+networks:
+  internal-net:
+    driver: bridge

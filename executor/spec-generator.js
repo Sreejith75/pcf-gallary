@@ -2,7 +2,7 @@
 
 /**
  * Spec Generator Adapter
- * Calls OpenAI to generate ComponentSpec from GlobalIntent + Capability
+ * Calls OpenAI (or compatible API) to generate ComponentSpec from GlobalIntent + Capability
  * NO HALLUCINATION - Strict schema validation
  */
 
@@ -13,7 +13,8 @@ const path = require('path');
 const OpenAI = require('openai');
 
 const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY
+    apiKey: process.env.OPENAI_API_KEY || 'mock-key-for-testing',
+    baseURL: process.env.OPENAI_BASE_URL // Optional: Support for xAI or other endpoints
 });
 
 const SUPPORTED_VERSION = '1.0';
@@ -44,13 +45,10 @@ async function generateSpec(inputJson, brainPath) {
         const schemaPath = path.join(brainPath, 'schemas/component-spec.schema.json');
 
         const promptTemplate = fs.readFileSync(promptPath, 'utf8');
-        // Schema loader might need to handle $ref if we split schemas, strictly simple for now
-        // Assuming schema is self-contained or we pass the relevant part
         let schema; 
         try {
              schema = JSON.parse(fs.readFileSync(schemaPath, 'utf8'));
         } catch(e) {
-             // Fallback or specific loading if schema doesn't exist yet
              console.warn('Schema file not found or invalid, proceeding without injection into prompt (LLM validation still applies)');
              schema = { "note": "Schema validation enforced by C# layer" };
         }
@@ -67,48 +65,141 @@ async function generateSpec(inputJson, brainPath) {
 
         console.log('✓ Prompt prepared\n');
 
-        // STEP 3: Call OpenAI
-        console.log('STEP 3: Calling OpenAI...');
-        
-        const response = await openai.chat.completions.create({
-            model: 'gpt-4',
-            messages: [
-                {
-                    role: 'system',
-                    content: 'You are a strict component specification generator. Output ONLY valid JSON.'
+        // STEP 3: API Key Check & Mock Fallback
+        const apiKey = process.env.OPENAI_API_KEY;
+        let result;
+
+        if (!apiKey) {
+            console.warn('⚠️ WARNING: OPENAI_API_KEY not found. Using MOCK response for testing.');
+            
+            // Mock Spec
+            result = {
+                version: "1.0",
+                componentType: "star-rating",
+                componentName: "StarRating",
+                namespace: "Contoso",
+                displayName: "Star Rating",
+                description: "A modern star rating component with hover effects.",
+                capabilities: {
+                    capabilityId: "star-rating",
+                    features: ["rating-display", "click-to-rate", "hover-effect"],
+                    customizations: { color: "#FFD700" }
                 },
-                {
-                    role: 'user',
-                    content: prompt
+                properties: [
+                    { name: "value", displayName: "Value", dataType: "Whole.None", usage: "bound", required: true, description: "The current rating value." },
+                    { name: "maxRating", displayName: "Max Rating", dataType: "Whole.None", usage: "input", required: false, description: "Maximum number of stars." }
+                ],
+                resources: {
+                    code: "index.ts",
+                    css: ["css/StarRating.css"],
+                    resx: ["strings/StarRating.resx"]
+                },
+                validation: {
+                    rulesApplied: ["pcf-naming", "accessibility-check"],
+                    warnings: [],
+                    downgrades: []
                 }
-            ],
-            temperature: 0.2, // Very low temperature for determinism
-            response_format: { type: 'json_object' }
-        });
+            };
+            console.log('✓ Mock response prepared');
+        } else {
+            console.log('STEP 3: Calling OpenAI (Model: grok-4-fast)...');
+            
+            const systemPrompt = `ROLE
+You are Grok AI (grok-4-fast) operating inside a strictly governed enterprise pipeline.
+You are NOT an autonomous agent.
+You act only as a bounded transformation engine under C# authority.
 
-        const llmOutput = response.choices[0].message.content;
-        console.log('✓ LLM response received\n');
+SYSTEM CONTEXT
+This system is a PCF Component Builder. C# is the sole authority. Node.js executes but never decides.
+All AI output is treated as untrusted and validated against schemas.
 
-        // STEP 4: Parse and validate
-        console.log('STEP 4: Parsing LLM output...');
-        
-        const spec = JSON.parse(llmOutput);
+GLOBAL SAFETY RULES
+❌ Do NOT invent fields
+❌ Do NOT invent enums
+❌ Do NOT invent capabilities
+❌ Do NOT invent defaults not allowed by schema
+❌ Do NOT generate explanations
+❌ Do NOT generate comments
+❌ Do NOT reference system internals
+If information is missing → choose minimal safe defaults or signal low confidence.
 
-        // Basic structural validation
-        if (spec.version !== SUPPORTED_VERSION) {
-            console.warn(`Warning: Generated version ${spec.version} does not match supported version ${SUPPORTED_VERSION}. C# layer may reject this.`);
+TASK 2 — COMPONENT SPEC GENERATION (STRICT MODE)
+YOUR RESPONSIBILITY
+Generate a ComponentSpec JSON that:
+Fully conforms to schema. Respects capability constraints. Uses minimal safe defaults.
+
+OUTPUT CONTRACT (JSON ONLY)
+{
+  "version": "1.0",
+  "componentType": "",
+  "displayName": "",
+  "description": "",
+  "properties": {},
+  "events": [],
+  "visual": {},
+  "interaction": {},
+  "accessibility": {},
+  "responsiveness": {}
+}
+
+RULES
+Ignore unsupported intent silently.
+Do NOT add extra fields.
+Do NOT explain choices.
+Do NOT infer future behavior.
+
+VERSIONING RULE
+All outputs must include: "version": "1.0". If version mismatches → output will be rejected.
+
+FAILURE AWARENESS
+Your output may be rejected. Rejection is expected behavior. Correctness > Completion.
+
+FINAL OPERATING PRINCIPLE
+You propose. C# decides. Execution happens elsewhere.`;
+
+            const response = await openai.chat.completions.create({
+                model: 'grok-4-fast',
+                messages: [
+                    {
+                        role: 'system',
+                        content: systemPrompt
+                    },
+                    {
+                        role: 'user',
+                        content: prompt
+                    }
+                ],
+                temperature: 0.2, // Determinism
+                response_format: { type: 'json_object' }
+            });
+
+            const llmOutput = response.choices[0].message.content;
+            console.log('✓ LLM response received\n');
+            
+            console.log('STEP 4: Parsing LLM output...');
+            result = JSON.parse(llmOutput);
         }
 
-        console.log('✓ JSON parsed successfully\n');
+        console.log('✓ JSON parsed/loaded successfully\n');
 
-        // STEP 5: Log result
+        // STEP 5: Validate contract (version check)
+        console.log('STEP 5: Validating output contract...');
+        
+        if (!result.version || result.version !== '1.0') {
+             throw new Error(`Invalid version: ${result.version}. Expected 1.0`);
+        }
+        if (!result.componentType) {
+            throw new Error('Missing componentType');
+        }
+
+        console.log('✓ Contract validated\n');
+
+        // STEP 6: Log result
         console.log('=== GENERATION RESULT ===');
-        console.log(`Version: ${spec.version}`);
-        console.log(`Component: ${spec.displayName} (${spec.componentType})`);
-        console.log(`Properties: ${Object.keys(spec.properties || {}).length}`);
+        console.log(JSON.stringify(result, null, 2));
         console.log();
 
-        return spec;
+        return result;
 
     } catch (error) {
         console.error(`\n❌ GENERATION FAILED: ${error.message}`);

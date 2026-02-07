@@ -33,16 +33,10 @@ public record ComponentCapability
     public required string Classification { get; init; }
 
     /// <summary>
-    /// Primary purpose of this capability.
-    /// </summary>
-    [JsonPropertyName("primaryPurpose")]
-    public required string PrimaryPurpose { get; init; }
-
-    /// <summary>
     /// Supported features.
     /// </summary>
     [JsonPropertyName("supportedFeatures")]
-    public required List<string> SupportedFeatures { get; init; }
+    public required List<CapabilityFeature> SupportedFeatures { get; init; }
 
     /// <summary>
     /// Capability limits and bounds.
@@ -60,7 +54,52 @@ public record ComponentCapability
     /// Template paths for code generation.
     /// </summary>
     [JsonPropertyName("templates")]
-    public required CapabilityTemplates Templates { get; init; }
+    public CapabilityTemplates? Templates { get; init; }
+
+    /// <summary>
+    /// Dependencies.
+    /// </summary>
+    [JsonPropertyName("dependencies")]
+    public CapabilityDependencies? Dependencies { get; init; }
+}
+
+public record CapabilityFeature
+{
+    [JsonPropertyName("featureId")]
+    public required string FeatureId { get; init; }
+
+    [JsonPropertyName("name")]
+    public required string Name { get; init; }
+
+    [JsonPropertyName("description")]
+    public required string Description { get; init; }
+
+    [JsonPropertyName("required")]
+    public required bool Required { get; init; }
+
+    [JsonPropertyName("configurable")]
+    public required bool Configurable { get; init; }
+
+    [JsonPropertyName("parameters")]
+    public Dictionary<string, FeatureParameter>? Parameters { get; init; }
+}
+
+public record FeatureParameter
+{
+    [JsonPropertyName("type")]
+    public required string Type { get; init; }
+
+    [JsonPropertyName("default")]
+    public object? Default { get; init; }
+
+    [JsonPropertyName("min")]
+    public int? Min { get; init; }
+
+    [JsonPropertyName("max")]
+    public int? Max { get; init; }
+
+    [JsonPropertyName("enum")]
+    public List<string>? Enum { get; init; }
 }
 
 public record ForbiddenBehavior
@@ -70,13 +109,25 @@ public record ForbiddenBehavior
 
     [JsonPropertyName("reason")]
     public required string Reason { get; init; }
+
+    [JsonPropertyName("alternative")]
+    public string? Alternative { get; init; }
 }
 
 public record CapabilityTemplates
 {
     [JsonPropertyName("typescript")]
-    public required string Typescript { get; init; }
+    public string? Typescript { get; init; }
 
     [JsonPropertyName("css")]
-    public required string Css { get; init; }
+    public string? Css { get; init; }
+}
+
+public record CapabilityDependencies
+{
+    [JsonPropertyName("pcfVersion")]
+    public string? PcfVersion { get; init; }
+
+    [JsonPropertyName("externalLibraries")]
+    public List<string>? ExternalLibraries { get; init; }
 }

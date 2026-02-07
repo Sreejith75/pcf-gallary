@@ -1,0 +1,31 @@
+# Build Stage
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+WORKDIR /src
+
+# Copy project files first to cache restore
+COPY ["src/AppWeaver.AIBrain.Api/AppWeaver.AIBrain.Api.csproj", "src/AppWeaver.AIBrain.Api/"]
+COPY ["src/AppWeaver.AIBrain/AppWeaver.AIBrain.csproj", "src/AppWeaver.AIBrain/"]
+
+RUN dotnet restore "src/AppWeaver.AIBrain.Api/AppWeaver.AIBrain.Api.csproj"
+
+# Copy source
+COPY src/ src/
+
+# Build
+WORKDIR "/src/src/AppWeaver.AIBrain.Api"
+RUN dotnet build "AppWeaver.AIBrain.Api.csproj" -c Release -o /app/build
+
+# Publish
+FROM build AS publish
+RUN dotnet publish "AppWeaver.AIBrain.Api.csproj" -c Release -o /app/publish /p:UseAppHost=false
+
+# Final Stage
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS final
+WORKDIR /app
+COPY --from=publish /app/publish .
+
+# Configure Environment
+ENV ASPNETCORE_URLS=http://+:5000
+EXPOSE 5000
+
+ENTRYPOINT ["dotnet", "AppWeaver.AIBrain.Api.dll"]

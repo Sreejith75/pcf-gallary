@@ -45,6 +45,15 @@ public static class AppWeaverAIBrainServiceCollectionExtensions
         // Register intent interpreter
         services.AddScoped<Intent.IIntentInterpreter, Intent.IntentInterpreter>();
 
+        // Register spec generator
+        services.AddScoped<Specs.IComponentSpecGenerator, Specs.ComponentSpecGenerator>();
+
+        // Register file generation planner
+        services.AddScoped<Generation.IFileGenerationPlanner, Generation.FileGenerationPlanner>();
+
+        // Register build orchestrator
+        services.AddScoped<Build.IBuildOrchestrator, Build.BuildOrchestrator>();
+
         return services;
     }
 

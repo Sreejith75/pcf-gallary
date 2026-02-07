@@ -4,6 +4,7 @@ using AppWeaver.AIBrain.Configuration;
 using AppWeaver.AIBrain.Logging;
 using AppWeaver.AIBrain.Models.Intent;
 using Microsoft.Extensions.Options;
+using System.Net.Http.Json;
 
 namespace AppWeaver.AIBrain.Intent;
 
@@ -111,11 +112,52 @@ public class IntentInterpreter : IIntentInterpreter
 
     /// <summary>
     /// Calls the Node.js Intent Interpreter and returns the result file path.
+    /// Supports both local process execution and remote HTTP execution (Docker).
     /// </summary>
     private async Task<string> CallNodeJsInterpreterAsync(
         string rawUserText,
         CancellationToken cancellationToken)
     {
+        var executorUrl = Environment.GetEnvironmentVariable("EXECUTOR_URL");
+
+        if (!string.IsNullOrEmpty(executorUrl))
+        {
+            // HTTP Mode (Docker)
+            try
+            {
+                using var client = new HttpClient();
+                // Increase timeout for AI processing
+                client.Timeout = TimeSpan.FromMinutes(2);
+
+                var payload = new
+                {
+                    userInput = rawUserText,
+                    brainPath = _options.BrainRootPath
+                };
+
+                var response = await client.PostAsJsonAsync(
+                    $"{executorUrl.TrimEnd('/')}/interpret", 
+                    payload, 
+                    cancellationToken);
+
+                response.EnsureSuccessStatusCode();
+
+                var jsonResult = await response.Content.ReadAsStringAsync(cancellationToken);
+                
+                // Write to temp file to match existing contract
+                var outputPath = "/tmp/intent-result.json";
+                await File.WriteAllTextAsync(outputPath, jsonResult, cancellationToken);
+                
+                return outputPath;
+            }
+            catch (Exception ex)
+            {
+                throw new IntentInterpreterExecutionException(
+                    $"Remote executor failed: {ex.Message}", ex);
+            }
+        }
+
+        // Local Process Mode
         var interpreterScript = Path.Combine(_nodeExecutorPath, "intent-interpreter.js");
 
         if (!File.Exists(interpreterScript))

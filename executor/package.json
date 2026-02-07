@@ -1,0 +1,14 @@
+{
+    "name": "appweaver-executor",
+    "version": "1.0.0",
+    "description": "Node.js executors for AppWeaver AI Brain",
+    "main": "executor.js",
+    "scripts": {
+        "test": "echo \"Error: no test specified\" && exit 1"
+    },
+    "dependencies": {
+        "express": "^5.2.1",
+        "handlebars": "^4.7.8",
+        "openai": "^4.28.0"
+    }
+}

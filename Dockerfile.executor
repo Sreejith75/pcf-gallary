@@ -1,0 +1,33 @@
+FROM node:20
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y zip wget
+
+# Install .NET 8 SDK (required for pac)
+RUN wget https://packages.microsoft.com/config/debian/12/packages-microsoft-prod.deb -O packages-microsoft-prod.deb \
+    && dpkg -i packages-microsoft-prod.deb \
+    && rm packages-microsoft-prod.deb \
+    && apt-get update \
+    && apt-get install -y dotnet-sdk-8.0
+
+# Install PAC CLI
+ENV PATH="$PATH:/root/.dotnet/tools"
+RUN dotnet tool install --global Microsoft.PowerApps.CLI.Tool
+
+WORKDIR /app
+
+# Copy Executor Code
+# We copy package.json first for caching
+COPY executor/package.json executor/
+
+WORKDIR /app/executor
+RUN npm install
+
+# Copy source
+COPY executor/ .
+
+# Expose port
+ENV PORT=5001
+EXPOSE 5001
+
+CMD ["node", "server.js"]

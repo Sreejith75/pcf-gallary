@@ -22,13 +22,13 @@ public class CapabilityValidator
         // Validate features
         foreach (var feature in spec.Capabilities.Features)
         {
-            if (!capability.SupportedFeatures.Contains(feature))
+            if (!capability.SupportedFeatures.Any(f => f.FeatureId == feature))
             {
                 errors.Add(new ValidationError
                 {
                     RuleId = "CAP_FEATURE_001",
                     Message = $"Feature '{feature}' is not supported by capability '{capability.CapabilityId}'",
-                    Suggestion = $"Supported features: {string.Join(", ", capability.SupportedFeatures)}",
+                    Suggestion = $"Supported features: {string.Join(", ", capability.SupportedFeatures.Select(f => f.FeatureId))}",
                     AutoFixable = false
                 });
             }

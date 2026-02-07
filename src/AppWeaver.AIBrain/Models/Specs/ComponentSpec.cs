@@ -9,10 +9,22 @@ namespace AppWeaver.AIBrain.Models.Specs;
 public record ComponentSpec
 {
     /// <summary>
+    /// Schema version (must be 1.0).
+    /// </summary>
+    [JsonPropertyName("version")]
+    public required string Version { get; init; }
+
+    /// <summary>
+    /// Component type identifier (e.g. star-rating).
+    /// </summary>
+    [JsonPropertyName("componentType")]
+    public required string ComponentType { get; init; }
+
+    /// <summary>
     /// Component identifier (kebab-case).
     /// </summary>
     [JsonPropertyName("componentId")]
-    public required string ComponentId { get; init; }
+    public string? ComponentId { get; init; }
 
     /// <summary>
     /// Component name (PascalCase).

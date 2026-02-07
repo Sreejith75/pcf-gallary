@@ -1,5 +1,7 @@
 {
     "capabilityId": "star-rating",
+    "displayName": "Star Rating",
+    "classification": "input-control",
     "componentType": "Star Rating Control",
     "description": "Interactive rating control that allows users to provide feedback using a star-based scale. Supports read-only display and editable input modes.",
     "supportedFeatures": [

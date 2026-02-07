@@ -70,6 +70,11 @@ public record ComponentExecutionPlan
     /// Validation report.
     /// </summary>
     public required SpecValidationResult ValidationReport { get; init; }
+
+    /// <summary>
+    /// Path to the generated ZIP artifact (if successful).
+    /// </summary>
+    public string? ZipPath { get; init; }
 }
 
 /// <summary>
