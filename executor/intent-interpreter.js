@@ -13,8 +13,8 @@ const path = require('path');
 const OpenAI = require('openai');
 
 const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY || 'mock-key-for-testing',
-    baseURL: process.env.OPENAI_BASE_URL // Optional: Support for xAI or other endpoints
+    apiKey: process.env.OPENAI_API_KEY || process.env.GROK_API_KEY || 'mock-key-for-testing',
+    baseURL: process.env.OPENAI_BASE_URL || 'https://api.x.ai/v1' // Default to xAI if not set
 });
 
 /**
@@ -52,7 +52,7 @@ async function interpretIntent(userInput, brainPath) {
         console.log('✓ Prompt prepared\n');
 
         // STEP 3: API Key Check & Mock Fallback
-        const apiKey = process.env.OPENAI_API_KEY;
+        const apiKey = process.env.OPENAI_API_KEY || process.env.GROK_API_KEY;
         let result;
 
         if (!apiKey) {
@@ -164,6 +164,7 @@ You are a controlled assistant inside a deterministic system.`;
             
             console.log('STEP 4: Parsing LLM output...');
             result = JSON.parse(llmOutput);
+            result.version = "1.0"; // Force contract version
         }
 
         console.log('✓ JSON parsed/loaded successfully\n');

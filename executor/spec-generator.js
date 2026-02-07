@@ -13,8 +13,8 @@ const path = require('path');
 const OpenAI = require('openai');
 
 const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY || 'mock-key-for-testing',
-    baseURL: process.env.OPENAI_BASE_URL // Optional: Support for xAI or other endpoints
+    apiKey: process.env.OPENAI_API_KEY || process.env.GROK_API_KEY || 'mock-key-for-testing',
+    baseURL: process.env.OPENAI_BASE_URL || 'https://api.x.ai/v1' // Default to xAI if not set
 });
 
 const SUPPORTED_VERSION = '1.0';
@@ -66,7 +66,7 @@ async function generateSpec(inputJson, brainPath) {
         console.log('✓ Prompt prepared\n');
 
         // STEP 3: API Key Check & Mock Fallback
-        const apiKey = process.env.OPENAI_API_KEY;
+        const apiKey = process.env.OPENAI_API_KEY || process.env.GROK_API_KEY;
         let result;
 
         if (!apiKey) {
@@ -134,7 +134,16 @@ OUTPUT CONTRACT (JSON ONLY)
   "componentType": "",
   "displayName": "",
   "description": "",
-  "properties": {},
+  "properties": [
+    {
+      "name": "exampleProperty",
+      "displayName": "Example Property",
+      "dataType": "SingleLine.Text",
+      "usage": "bound",
+      "required": true,
+      "description": "Example description"
+    }
+  ],
   "events": [],
   "visual": {},
   "interaction": {},
@@ -175,6 +184,7 @@ You propose. C# decides. Execution happens elsewhere.`;
 
             const llmOutput = response.choices[0].message.content;
             console.log('✓ LLM response received\n');
+            console.log('RAW LLM OUTPUT:', llmOutput); // DEBUG LOG
             
             console.log('STEP 4: Parsing LLM output...');
             result = JSON.parse(llmOutput);

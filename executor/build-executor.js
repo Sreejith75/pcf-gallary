@@ -27,8 +27,13 @@ function runCommand(command, cwd) {
  * @param {string} workingDir - Directory containing generated files
  * @param {string} componentName - Name for artifact naming
  */
+/**
+ * Main build function.
+ * @param {string} workingDir - Directory containing generated files
+ * @param {string} componentName - Name for artifact naming
+ */
 function buildPcf(workingDir, componentName) {
-    console.log('=== PCF Build Executor ===\n');
+    console.log('=== PCF Build Executor (Solution Aware) ===\n');
     console.log(`Directory: ${workingDir}`);
     console.log(`Component: ${componentName}\n`);
 
@@ -37,79 +42,125 @@ function buildPcf(workingDir, componentName) {
     }
 
     try {
-        // 1. Initialize PCF Project (Stub/mock if files exist, or use pac pcf init with forced parameters?)
-        // The requirement says: "pac pcf init", "npm install", "npm run build".
-        // BUT we already generated files (ControlManifest, index.ts, etc.). 
-        // Running `pac pcf init` might overwrite them or fail if directory not empty.
-        // HOWEVER, the instruction implies strict flow: generated files -> then pac pcf init?? 
-        // Actually, usually `pac pcf init` Generates the skeleton. 
-        // If we generated the files ourselves, we are Replacing the need for `pac pcf init` OR we run it first then overwrite.
-        // Requirement says: "Execution Steps ... Plan File Generation ... Invoke file-generator.js ... Invoke PCF CLI"
-        // This suggests files are present BEFORE CLI.
-        // `pac pcf init` usually fails in non-empty dir. 
-        // Strategy: We assume the generated files constitute a valid PCF project structure suitable for `npm install && npm run build`.
-        // If `pac pcf init` is strictly required to scaffold hidden files (like .pcfproj / or just to validate), it is problematic if files exist.
-        // Let's check requirements: "Commands executed: pac pcf init, npm install..."
-        // Maybe we run init in empty dir, then overwrite?
-        // BUT `BuildOrchestrator.cs` invokes `file-generator.js` FIRST. So files exist.
-        // WE WILL SKIP `pac pcf init` if it conflicts, or assume the generated `package.json` and structure is sufficient.
-        // Wait, typical PCF build needs `pcf-scripts`.
-        // If we strictly follow "pac pcf init", we might face issues.
-        // Let's assume we proceed with `npm install` and `npm run build` directly since we generated `package.json`.
-        // IF `pac pcf init` is MANDATORY per prompt "Commands executed: pac pcf init", I must handle it.
-        // BUT strict constraint "failure at any step -> hard fail" implies `pac pcf init` failing is bad.
-        // I will attempt `npm install` directly. If prompt demands `pac pcf init`, I'd need to do it BEFORE file gen, but the prompt says AFTER.
-        // Prompt Check: "Execution Steps ... Plan File Generation ... Invoke file-generator.js ... Invoke PCF CLI"
-        // This implies files are there.
-        // I will assume `pac pcf init` is NOT needed if we generated everything, OR strictly requested.
-        // If strictly requested, I'll try to run it but ignore "directory not empty" error? No, `pac` is strict.
-        // I will SKIP `pac pcf init` and comment why (files already generated).
-        // EDIT: Re-reading "Commands executed: pac pcf init...".
-        // It might be that I should run `pac pcf init` to create the project structure, AND THEN overlay my generated files?
-        // But logic is "Invoke file-generator.js" THEN "Invoke PCF CLI". That means Overwrite is impossible if CLI runs 2nd.
-        // Wait! The Plan: "Plan File Generation -> Invoke file-generator.js -> Invoke PCF CLI".
-        // This order dictates files are generated first.
-        // If `pac pcf init` is run in a directory with matching files, it fails.
-        // I'll assume the prompt meant "Build the project", and since I generated files, `npm install` is the build step.
-        // However, `pac pcf init` is listed explicitly. 
-        // I will TRY to run `npm install`. If that suffices, good. 
-        // Actually, without `.pcfproj` or similar (for dotnet build), `pac pcf push` works? 
-        // ComponentSpec didn't mention .pcfproj.
-        // I will proceed with NPM commands.
+        // STEP 0: Metadata Extraction
+        // We need Namespace and Name to generate the .pcfproj correctly using 'pac pcf init'
+        const manifestPath = path.join(workingDir, 'ControlManifest.Input.xml');
+        if (!fs.existsSync(manifestPath)) {
+            throw new Error(`ControlManifest.Input.xml not found at ${manifestPath}`);
+        }
         
-        console.log('STEP 1: NPM Install');
-        runCommand('npm install', workingDir);
+        const manifestContent = fs.readFileSync(manifestPath, 'utf8');
+        // Simple regex to extract namespace and constructor
+        const nsMatch = manifestContent.match(/namespace="([^"]+)"/);
+        const nameMatch = manifestContent.match(/constructor="([^"]+)"/);
+        
+        const namespace = nsMatch ? nsMatch[1] : 'AppWeaver';
+        const controlName = nameMatch ? nameMatch[1] : componentName;
 
-        console.log('\nSTEP 2: NPM Build');
+        console.log(`Detected Namespace: ${namespace}`);
+        console.log(`Detected Control: ${controlName}`);
+
+        // STEP 1: Generate .pcfproj (Missing link for Solution)
+        // file-generator.js creates files but NOT the .pcfproj required for 'pac solution add-reference'.
+        // We run 'pac pcf init' in a temp folder and copy the project file over.
+        console.log('\nSTEP 1: Generating .pcfproj...');
+        
+        const tempInitDir = path.join(workingDir, '_temp_init');
+        if (fs.existsSync(tempInitDir)) {
+             fs.rmSync(tempInitDir, { recursive: true, force: true });
+        }
+        fs.mkdirSync(tempInitDir);
+        
+        // Run init in temp
+        runCommand(`pac pcf init --namespace ${namespace} --name ${controlName} --template field`, tempInitDir);
+        
+        // Find and copy .pcfproj
+        const files = fs.readdirSync(tempInitDir);
+        const projFile = files.find(f => f.endsWith('.pcfproj'));
+        
+        if (projFile) {
+            fs.copyFileSync(path.join(tempInitDir, projFile), path.join(workingDir, projFile));
+            console.log(`✓ Copied project file: ${projFile}`);
+        } else {
+            console.warn('⚠️ No .pcfproj found in temp init. Solution build might fail.');
+        }
+
+        // Cleanup temp
+        fs.rmSync(tempInitDir, { recursive: true, force: true });
+
+        // STEP 2: NPM Build (Control Build)
+        console.log('\nSTEP 2: Building Control (NPM)...');
+        runCommand('npm install', workingDir);
         runCommand('npm run build', workingDir);
 
-        console.log('\nSTEP 3: Packaging ZIP');
-        // Construct ZIP name based on specific requirement {ComponentName}_{buildId}.zip
-        // "buildId" is implied from context or arg? 
-        // "node build-executor.js /tmp/pcf-build/{buildId} {componentName}" passed from C#.
-        const parentDir = path.dirname(workingDir);
-        const buildId = path.basename(workingDir); // build_...
-        const zipName = `${componentName}_${buildId}.zip`;
-        const zipPath = path.join(workingDir, zipName);
+        // STEP 3: Solution Packaging
+        console.log('\nSTEP 3: Packaging Solution...');
         
-        // Use `zip` command or archiver? Requirement example: "zip -r ..."
-        // We'll use `zip` command line if available, or a node replacement?
-        // "Commands executed... Then ZIP: zip -r ..." implies shell command.
-        // Mac environment has `zip`.
-        runCommand(`zip -r "${zipName}" . -x node_modules/*`, workingDir);
-
-        if (!fs.existsSync(zipPath)) {
-            throw new Error('ZIP file creation failed');
+        // PAC CLI (v1.x/v2.x) uses the folder name as the solution name by default.
+        // We must name the folder exactly what we want the solution to be.
+        const solutionName = `${controlName}_Solution`;
+        const solutionDir = path.join(workingDir, solutionName);
+        
+        if (fs.existsSync(solutionDir)) {
+            fs.rmSync(solutionDir, { recursive: true, force: true });
         }
+        fs.mkdirSync(solutionDir);
+
+        const publisherName = 'Bytestrone';
+        const publisherPrefix = 'bts';
+
+        // a. Init Solution
+        // Removed --solution-name as it causes "unknown argument" error in some PAC versions.
+        runCommand(`pac solution init --publisher-name ${publisherName} --publisher-prefix ${publisherPrefix}`, solutionDir);
+
+        // b. Add Reference to Control
+        // The control is in the parent directory of the solution folder
+        runCommand(`pac solution add-reference --path ..`, solutionDir);
+
+        // c. Build Solution (Generates ZIP)
+        // 'dotnet build' in the solution directory produces the Managed/Unmanaged zip
+        runCommand('dotnet restore', solutionDir);
+        runCommand('dotnet build', solutionDir);
+
+
+        // STEP 4: Extract Artifact
+        console.log('\nSTEP 4: Finalizing Artifact...');
+        
+        // Expected location: output/bin/Debug/{SolutionName}.zip
+        const binDebug = path.join(solutionDir, 'bin', 'Debug');
+        
+        if (!fs.existsSync(binDebug)) {
+             throw new Error(`Solution build output directory not found: ${binDebug}`);
+        }
+
+        // Find the zip
+        const solutionZips = fs.readdirSync(binDebug).filter(f => f.endsWith('.zip'));
+        if (solutionZips.length === 0) {
+            throw new Error('No Solution ZIP found in build output');
+        }
+        
+        const sourceZip = path.join(binDebug, solutionZips[0]);
+        
+        // Target: {componentName}_{buildId}.zip
+        // buildId corresponds to the folder name usually, or passed context.
+        // We will respect the previous logic for naming.
+        const buildId = path.basename(workingDir); 
+        const targetZipName = `${componentName}_${buildId}.zip`;
+        const finalZipPath = path.join(workingDir, targetZipName);
+        
+        fs.copyFileSync(sourceZip, finalZipPath);
+        console.log(`✓ Artifact ready: ${finalZipPath}`);
 
         console.log(JSON.stringify({
             step: "PCFBuild",
             status: "Success",
-            zipPath: zipPath
+            zipPath: finalZipPath,
+            solutionZip: sourceZip
         }));
 
     } catch (error) {
         console.error(`\n❌ BUILD FAILED: ${error.message}`);
+        console.error(error.stack);
         process.exit(1);
     }
 }

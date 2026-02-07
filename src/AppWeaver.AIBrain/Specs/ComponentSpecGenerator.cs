@@ -48,6 +48,7 @@ public class ComponentSpecGenerator : IComponentSpecGenerator
 
             // STEP 2: Read AI Output
             var jsonContent = await File.ReadAllTextAsync(resultFilePath, cancellationToken);
+            BrainLogger.LogOperation(buildId, "GenerateComponentSpec", "RawOutput", 0, metadata: new { content = jsonContent });
 
             // STEP 3: Validate JSON Structural Integrity & Contract
             var spec = DeserializeAndValidateStructure(jsonContent);

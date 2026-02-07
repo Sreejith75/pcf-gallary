@@ -1,0 +1,79 @@
+@import "tailwindcss";
+
+:root {
+  /* Bytestrone Enterprise Palette - Refined */
+  --background: #f8fafc;
+  /* Slate-50 */
+  --foreground: #1e293b;
+  /* Slate-800 */
+
+  /* Brand Colors */
+  --primary: #0f172a;
+  /* Slate-900 - Primary Brand */
+  --primary-foreground: #ffffff;
+
+  --secondary: #ffffff;
+  --secondary-foreground: #475569;
+  /* Slate-600 */
+
+  --accent: #3b82f6;
+  /* Blue-500 - Vivid Accent */
+  --accent-foreground: #ffffff;
+
+  --muted: #f1f5f9;
+  /* Slate-100 */
+  --muted-foreground: #64748b;
+  /* Slate-500 */
+
+  --border: #e2e8f0;
+  /* Slate-200 */
+  --input: #e2e8f0;
+
+  /* Sidebar Specifics */
+  --sidebar-bg: #0f172a;
+  /* Slate-900 - Dark Sidebar for Enterprise look */
+  --sidebar-fg: #94a3b8;
+  /* Slate-400 */
+  --sidebar-border: #1e293b;
+  /* Slate-800 */
+  --sidebar-active-bg: #1e293b;
+  /* Slate-800 */
+  --sidebar-active-fg: #ffffff;
+  /* White */
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+
+  --color-border: var(--border);
+  --color-input: var(--input);
+
+  --color-sidebar: var(--sidebar-bg);
+  --color-sidebar-foreground: var(--sidebar-fg);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-active: var(--sidebar-active-bg);
+  --color-sidebar-active-foreground: var(--sidebar-active-fg);
+
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans), sans-serif;
+  -webkit-font-smoothing: antialiased;
+}

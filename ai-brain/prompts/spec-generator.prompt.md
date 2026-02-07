@@ -85,9 +85,30 @@ You must output **ONLY JSON** in this exact structure:
 {
   "version": "1.0",
   "componentType": "",
+  "componentName": "",
+  "namespace": "",
   "displayName": "",
   "description": "",
-  "properties": {},
+  "capabilities": {
+    "capabilityId": "",
+    "features": [],
+    "customizations": {}
+  },
+  "properties": [
+    {
+      "name": "propertyName",
+      "displayName": "Property Name",
+      "dataType": "SingleLine.Text",
+      "usage": "bound",
+      "required": true,
+      "description": "Description"
+    }
+  ],
+  "resources": {
+    "code": "index.ts",
+    "css": [],
+    "resx": []
+  },
   "events": [],
   "visual": {},
   "interaction": {},
@@ -125,12 +146,45 @@ Star rating, modern, compact, touch friendly
 {
   "version": "1.0",
   "componentType": "star-rating",
+  "componentName": "StarRating",
+  "namespace": "Contoso",
   "displayName": "Star Rating",
   "description": "A compact star rating input component",
-  "properties": {
-    "maxRating": 5,
-    "allowHalfRating": false,
-    "readOnly": false
+  "capabilities": {
+    "capabilityId": "star-rating",
+    "features": ["rating-display", "click-to-rate", "hover-effect"],
+    "customizations": { "color": "#FFD700" }
+  },
+  "properties": [
+    {
+      "name": "maxRating",
+      "displayName": "Max Rating",
+      "dataType": "Whole.None",
+      "usage": "input",
+      "required": false,
+      "description": "Maximum number of stars"
+    },
+    {
+      "name": "allowHalfRating",
+      "displayName": "Allow Half Rating",
+      "dataType": "TwoOptions",
+      "usage": "input",
+      "required": false,
+      "description": "Enable half-star selection"
+    },
+    {
+        "name": "value",
+        "displayName": "Value", 
+        "dataType": "Whole.None", 
+        "usage": "bound", 
+        "required": true, 
+        "description": "Current value" 
+    }
+  ],
+  "resources": {
+    "code": "index.ts",
+    "css": ["css/StarRating.css"],
+    "resx": ["strings/StarRating.resx"]
   },
   "events": ["onChange"],
   "visual": {
@@ -165,11 +219,24 @@ Drag and drop star reordering
   "componentType": "star-rating",
   "displayName": "Star Rating",
   "description": "A star rating input component",
-  "properties": {
-    "maxRating": 5,
-    "allowHalfRating": false,
-    "readOnly": false
-  },
+  "properties": [
+    {
+      "name": "maxRating",
+      "displayName": "Max Rating",
+      "dataType": "Whole.None",
+      "usage": "input",
+      "required": false,
+      "description": "Maximum number of stars"
+    },
+    {
+        "name": "value",
+        "displayName": "Value", 
+        "dataType": "Whole.None", 
+        "usage": "bound", 
+        "required": true, 
+        "description": "Current value" 
+    }
+  ],
   "events": ["onChange"],
   "visual": {
     "style": "default",

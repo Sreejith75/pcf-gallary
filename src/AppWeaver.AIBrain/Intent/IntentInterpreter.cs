@@ -45,6 +45,7 @@ public class IntentInterpreter : IIntentInterpreter
 
             // STEP 2: Read JSON result
             var jsonContent = await File.ReadAllTextAsync(resultFilePath, cancellationToken);
+            BrainLogger.LogOperation(buildId, "InterpretIntent", "RawOutput", 0, metadata: new { content = jsonContent });
 
             // STEP 3: Parse JSON
             var rawResult = JsonSerializer.Deserialize<IntentInterpreterRawOutput>(
@@ -286,11 +287,11 @@ public class IntentInterpreter : IIntentInterpreter
 /// </summary>
 internal sealed class IntentInterpreterRawOutput
 {
-    public required string Version { get; init; }
+    public string? Version { get; init; }
     public GlobalIntent? GlobalIntent { get; init; }
-    public required double Confidence { get; init; }
+    public double Confidence { get; init; }
     public List<string>? UnmappedPhrases { get; init; }
-    public required bool NeedsClarification { get; init; }
+    public bool NeedsClarification { get; init; }
 }
 
 /// <summary>
