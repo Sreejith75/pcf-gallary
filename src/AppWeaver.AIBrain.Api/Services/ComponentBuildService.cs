@@ -53,8 +53,13 @@ public class ComponentBuildService
                 // Update state
                 state.Status = "Completed";
                 state.ZipPath = result.ZipPath;
+                // Preview URL: /preview/{buildId}/index.html
+                // Base URL is relative to API root for now, or full URL if domain known.
+                // Since frontend calls API, relative is fine if proxied, but absolute is safer for direct use.
+                // We'll rely on relative path from API root: /preview/buildId/index.html
+                state.PreviewUrl = $"/preview/{result.BuildId}/index.html";
                 
-                BrainLogger.LogOperation(trackingId, "ApiCreateComponent", "Completed", 0, metadata: new { zip = result.ZipPath, internalBuildId = result.BuildId });
+                BrainLogger.LogOperation(trackingId, "ApiCreateComponent", "Completed", 0, metadata: new { zip = result.ZipPath, internalBuildId = result.BuildId, preview = state.PreviewUrl });
             }
             catch (Exception ex)
             {
@@ -78,6 +83,7 @@ public class ComponentBuildService
             {
                 BuildId = state.BuildId,
                 Status = state.Status,
+                PreviewUrl = state.PreviewUrl,
                 Error = state.Error
             };
         }
@@ -102,6 +108,7 @@ public class ComponentBuildService
         public required string Status { get; set; } // Running, Completed, Failed
         public DateTime CreatedAt { get; set; }
         public string? ZipPath { get; set; }
+        public string? PreviewUrl { get; set; }
         public string? Error { get; set; }
     }
 }

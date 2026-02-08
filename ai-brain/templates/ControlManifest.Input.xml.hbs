@@ -1,15 +1,18 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <manifest>
-  <control namespace="{{namespace}}" constructor="{{componentName}}" version="{{version}}" display-name-key="{{displayName}}" description-key="{{description}}" control-type="{{interactions.controlType}}">
+  <control namespace="{{namespace}}" constructor="{{componentName}}" version="{{version}}"
+    display-name-key="{{displayName}}" description-key="{{description}}"
+    control-type="{{#if interaction.controlType}}{{interaction.controlType}}{{else}}standard{{/if}}">
     <!-- external-service-usage node declares whether this 3rd party PCF control is using external service or not, if yes, this control will be considered as premium and please also add "premium" to the tags -->
     <external-service-usage enabled="false">
       <!-- <domain>www.Microsoft.com</domain> -->
     </external-service-usage>
     <!-- property node identifies a specific, configurable piece of data that the control expects from CDS -->
     {{#each properties}}
-    <property name="{{name}}" display-name-key="{{displayName}}" description-key="{{description}}" of-type="{{dataType}}" usage="{{usage}}" required="{{required}}" />
+    <property name="{{name}}" display-name-key="{{displayName}}" description-key="{{description}}"
+      of-type="{{dataType}}" usage="{{usage}}" required="{{required}}" />
     {{/each}}
-    
+
     <resources>
       <code path="index.ts" order="1" />
       <css path="css/{{componentName}}.css" order="1" />

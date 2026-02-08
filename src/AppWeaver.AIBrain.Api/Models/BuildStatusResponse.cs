@@ -19,4 +19,5 @@ public class BuildStatusResponse
     /// Error message if the build failed.
     /// </summary>
     public string? Error { get; set; }
+    public string? PreviewUrl { get; set; }
 }

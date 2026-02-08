@@ -1,0 +1,29 @@
+import * as React from 'react';
+import { IInputs } from "./generated/ManifestTypes";
+
+export interface I{{componentName}}Props {
+    {{#each properties}}
+    {{name}}?: {{#if (eq dataType "Whole.None")}}number{{else if (eq dataType "TwoOptions")}}boolean{{else}}string{{/if}};
+    {{/each}}
+    onChange?: (prop: string, value: any) => void;
+}
+
+export const {{componentName}}View: React.FC<I{{componentName}}Props> = (props) => {
+    return (
+        <div className="{{componentName}}-view">
+            <h3>{{displayName}} Component</h3>
+            <p>{{description}}</p>
+            <div className="props-list">
+                <h4>Properties:</h4>
+                <ul>
+                    {{#each properties}}
+                    <li>
+                        <strong>{{displayName}}: </strong> 
+                        {JSON.stringify(props.{{name}})}
+                    </li>
+                    {{/each}}
+                </ul>
+            </div>
+        </div>
+    );
+};

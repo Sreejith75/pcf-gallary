@@ -11,6 +11,11 @@ const path = require('path');
 // Note: You must install handlebars: npm install handlebars
 const Handlebars = require('handlebars');
 
+// Register helpers
+Handlebars.registerHelper('eq', function (a, b) {
+    return a === b;
+});
+
 /**
  * Generates files based on the provided plan and spec.
  * @param {object} input - { version, componentSpec, fileGenerationPlan }
@@ -23,6 +28,13 @@ function generateFiles(input, outputDir, templatesDir) {
     try {
         const { version, componentSpec, fileGenerationPlan } = input;
 
+        // FIX: Dataverse requires 3-part version (1.0.0) but C# contract enforces 1.0.
+        // We upgrade the version in-memory here for file generation only.
+        if (componentSpec.version === '1.0') {
+            componentSpec.version = '1.0.0';
+            console.log('! Upgraded ComponentSpec version to 1.0.0 for file generation');
+        }
+
         // 1. Validation
         if (!componentSpec || !fileGenerationPlan) {
             throw new Error('Missing componentSpec or fileGenerationPlan');
@@ -30,6 +42,29 @@ function generateFiles(input, outputDir, templatesDir) {
         if (!fileGenerationPlan.steps || !Array.isArray(fileGenerationPlan.steps)) {
             throw new Error('Invalid fileGenerationPlan: steps array missing');
         }
+
+        // FIX: Inject Preview System files into the plan
+        // The C# orchestrator might not know about these new files yet.
+        const previewSteps = [
+            {
+                templateName: 'Control.tsx.hbs',
+                outputPath: `${componentSpec.componentName}View.tsx`, 
+                order: 90
+            },
+            {
+                templateName: 'preview.tsx.hbs',
+                outputPath: 'preview.tsx',
+                order: 91
+            }
+        ];
+        
+        // Remove existing entries if they exist to avoid duplicates (defensive)
+        fileGenerationPlan.steps = fileGenerationPlan.steps.filter(s => 
+            s.outputPath !== 'preview.tsx' && !s.outputPath.endsWith('View.tsx')
+        );
+        
+        fileGenerationPlan.steps.push(...previewSteps);
+        console.log('! Injected Preview System files into Generation Plan');
 
         console.log(`Component: ${componentSpec.componentName} (${componentSpec.componentType})`);
         console.log(`Plan: ${fileGenerationPlan.steps.length} files to generate`);

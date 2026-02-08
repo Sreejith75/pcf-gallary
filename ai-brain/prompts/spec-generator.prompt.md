@@ -111,7 +111,11 @@ You must output **ONLY JSON** in this exact structure:
   },
   "events": [],
   "visual": {},
-  "interaction": {},
+  "interaction": {
+    "controlType": "standard",
+    "inputMethods": [],
+    "feedback": []
+  },
   "accessibility": {},
   "responsiveness": {}
 }
@@ -192,6 +196,7 @@ Star rating, modern, compact, touch friendly
     "density": "compact"
   },
   "interaction": {
+    "controlType": "standard",
     "hoverEffect": true,
     "inputMethods": ["mouse", "touch"]
   },
@@ -243,6 +248,7 @@ Drag and drop star reordering
     "density": "normal"
   },
   "interaction": {
+    "controlType": "standard",
     "hoverEffect": true,
     "inputMethods": ["mouse"]
   },

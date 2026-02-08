@@ -1,0 +1,21 @@
+import * as React from 'react';
+import * as ReactDOM from 'react-dom';
+import { {{componentName}}View, I{{componentName}}Props } from './{{componentName}}View';
+
+declare global {
+interface Window {
+__PREVIEW_PROPS__: I{{componentName}}Props;
+}
+}
+
+const props = window.__PREVIEW_PROPS__ || {};
+
+const target = document.getElementById('root');
+if (target) {
+ReactDOM.render(
+<{{componentName}}View {...props} />,
+target
+);
+} else {
+console.error('Preview root element not found');
+}

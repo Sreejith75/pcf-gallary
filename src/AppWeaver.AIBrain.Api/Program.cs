@@ -83,6 +83,23 @@ if (app.Environment.IsDevelopment())
 
 app.UseCors("AllowFrontend");
 
+// Serve Static PCF Previews
+// Maps /preview/{buildId}/... to /tmp/pcf-build/{buildId}/preview/...
+var pcfBuildRoot = "/tmp/pcf-build";
+if (!Directory.Exists(pcfBuildRoot)) Directory.CreateDirectory(pcfBuildRoot);
+
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new Microsoft.Extensions.FileProviders.PhysicalFileProvider(pcfBuildRoot),
+    RequestPath = "/preview",
+    ServeUnknownFileTypes = true, // Bundle.js might be weird sometimes
+    OnPrepareResponse = ctx =>
+    {
+        ctx.Context.Response.Headers.Append("Cache-Control", "no-cache, no-store");
+        ctx.Context.Response.Headers.Append("Access-Control-Allow-Origin", "*");
+    }
+});
+
 app.UseHttpsRedirection();
 
 app.UseAuthorization();

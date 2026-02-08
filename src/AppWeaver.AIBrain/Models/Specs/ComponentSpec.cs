@@ -69,10 +69,79 @@ public record ComponentSpec
     public required ResourceConfig Resources { get; init; }
 
     /// <summary>
+    /// Component events.
+    /// </summary>
+    [JsonPropertyName("events")]
+    public List<string>? Events { get; init; }
+
+    /// <summary>
+    /// Visual configuration.
+    /// </summary>
+    [JsonPropertyName("visual")]
+    public VisualConfig? Visual { get; init; }
+
+    /// <summary>
+    /// Interaction configuration.
+    /// </summary>
+    [JsonPropertyName("interaction")]
+    public InteractionConfig? Interaction { get; init; }
+
+    /// <summary>
+    /// Accessibility configuration.
+    /// </summary>
+    [JsonPropertyName("accessibility")]
+    public AccessibilityConfig? Accessibility { get; init; }
+
+    /// <summary>
+    /// Responsiveness configuration.
+    /// </summary>
+    [JsonPropertyName("responsiveness")]
+    public ResponsivenessConfig? Responsiveness { get; init; }
+
+    /// <summary>
     /// Validation metadata.
     /// </summary>
     [JsonPropertyName("validation")]
     public ValidationMetadata? Validation { get; init; }
+}
+
+public record VisualConfig
+{
+    [JsonPropertyName("style")]
+    public string? Style { get; init; }
+
+    [JsonPropertyName("density")]
+    public string? Density { get; init; }
+}
+
+public record InteractionConfig
+{
+    [JsonPropertyName("controlType")]
+    public string? ControlType { get; init; }
+
+    [JsonPropertyName("hoverEffect")]
+    public bool? HoverEffect { get; init; }
+
+    [JsonPropertyName("inputMethods")]
+    public List<string>? InputMethods { get; init; }
+}
+
+public record AccessibilityConfig
+{
+    [JsonPropertyName("ariaLabel")]
+    public string? AriaLabel { get; init; }
+
+    [JsonPropertyName("keyboardSupport")]
+    public bool? KeyboardSupport { get; init; }
+}
+
+public record ResponsivenessConfig
+{
+    [JsonPropertyName("target")]
+    public string? Target { get; init; }
+
+    [JsonPropertyName("adaptiveLayout")]
+    public bool? AdaptiveLayout { get; init; }
 }
 
 public record CapabilityConfig

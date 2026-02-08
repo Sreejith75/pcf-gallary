@@ -9,6 +9,7 @@ export default function AIBuilderPage() {
     const [isBuilding, setIsBuilding] = useState(false);
     const [status, setStatus] = useState<BuildStatus>("pending");
     const [buildId, setBuildId] = useState<string | undefined>(undefined);
+    const [previewUrl, setPreviewUrl] = useState<string | undefined>(undefined);
     const [logs, setLogs] = useState<string[]>([]);
 
     // Poll for status
@@ -28,6 +29,15 @@ export default function AIBuilderPage() {
                     if (buildStatus.status === "Failed") uiStatus = "failed";
 
                     setStatus(uiStatus);
+
+                    // Set Preview URL if available
+                    if (buildStatus.previewUrl) {
+                        const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5001";
+                        // Ensure no double slash
+                        const cleanBase = baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl;
+                        const cleanPath = buildStatus.previewUrl.startsWith('/') ? buildStatus.previewUrl : `/${buildStatus.previewUrl}`;
+                        setPreviewUrl(`${cleanBase}${cleanPath}`);
+                    }
 
                     if (buildStatus.error) {
                         setLogs(prev => [...prev, `Error: ${buildStatus.error}`]);
@@ -63,6 +73,7 @@ export default function AIBuilderPage() {
         setStatus("running");
         setLogs(["Initializing build request...", "Sending prompt to AI engine..."]);
         setBuildId(undefined);
+        setPreviewUrl(undefined);
 
         try {
             const response = await createComponent(prompt);
@@ -147,6 +158,7 @@ export default function AIBuilderPage() {
                 buildId={buildId}
                 logs={logs}
                 componentName={prompt.length > 30 ? prompt.substring(0, 30) + "..." : prompt || "Custom Component"}
+                previewUrl={previewUrl}
                 onDownload={handleDownload}
             />
         </div>

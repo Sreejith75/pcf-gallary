@@ -130,7 +130,7 @@ Fully conforms to schema. Respects capability constraints. Uses minimal safe def
 
 OUTPUT CONTRACT (JSON ONLY)
 {
-  "version": "1.0",
+  "version": "1.0.0",
   "componentType": "",
   "displayName": "",
   "description": "",
@@ -196,10 +196,12 @@ You propose. C# decides. Execution happens elsewhere.`;
         console.log('STEP 5: Validating output contract...');
         
         if (!result.version || result.version !== '1.0') {
-             throw new Error(`Invalid version: ${result.version}. Expected 1.0`);
+             console.error('FAILED RESULT:', JSON.stringify(result, null, 2));
+             throw new Error(`Invalid version: ${result.version || 'MISSING'}. Expected 1.0`);
         }
         if (!result.componentType) {
-            throw new Error('Missing componentType');
+             console.error('FAILED RESULT:', JSON.stringify(result, null, 2));
+             throw new Error('Missing componentType');
         }
 
         console.log('✓ Contract validated\n');

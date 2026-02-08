@@ -9,6 +9,7 @@ export interface BuildStatusResponse {
     status: string; // "Running" | "Completed" | "Failed"
     error?: string;
     zipPath?: string;
+    previewUrl?: string;
 }
 
 export type BuildStatus = "Pending" | "Running" | "Completed" | "Failed";

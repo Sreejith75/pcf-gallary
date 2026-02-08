@@ -5,7 +5,8 @@
     "description": "Normalized specification for a PCF component after intent resolution",
     "type": "object",
     "required": [
-        "componentId",
+        "version",
+        "componentType",
         "componentName",
         "namespace",
         "capabilities",
@@ -13,10 +14,20 @@
         "resources"
     ],
     "properties": {
+        "version": {
+            "type": "string",
+            "enum": [
+                "1.0"
+            ]
+        },
+        "componentType": {
+            "type": "string",
+            "description": "Component type identifier (e.g. star-rating)"
+        },
         "componentId": {
             "type": "string",
             "pattern": "^[a-z][a-z0-9-]*$",
-            "description": "Unique identifier in kebab-case"
+            "description": "Unique identifier in kebab-case (OPTIONAL, use componentType instead)"
         },
         "componentName": {
             "type": "string",
@@ -174,6 +185,74 @@
                             }
                         }
                     }
+                }
+            }
+        },
+        "events": {
+            "type": "array",
+            "items": {
+                "type": "string"
+            }
+        },
+        "visual": {
+            "type": "object",
+            "properties": {
+                "style": {
+                    "type": "string"
+                },
+                "density": {
+                    "type": "string"
+                }
+            }
+        },
+        "interaction": {
+            "type": "object",
+            "properties": {
+                "controlType": {
+                    "type": "string",
+                    "enum": [
+                        "standard",
+                        "virtual",
+                        "none",
+                        "react"
+                    ]
+                },
+                "hoverEffect": {
+                    "type": "boolean"
+                },
+                "inputMethods": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "feedback": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                }
+            }
+        },
+        "accessibility": {
+            "type": "object",
+            "properties": {
+                "ariaLabel": {
+                    "type": "string"
+                },
+                "keyboardSupport": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "responsiveness": {
+            "type": "object",
+            "properties": {
+                "target": {
+                    "type": "string"
+                },
+                "adaptiveLayout": {
+                    "type": "boolean"
                 }
             }
         }
