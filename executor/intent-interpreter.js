@@ -56,49 +56,8 @@ async function interpretIntent(userInput, brainPath) {
         let result;
 
         if (!apiKey) {
-            console.warn('⚠️ WARNING: OPENAI_API_KEY not found. Using MOCK response for testing.');
-            
-            // Mock response based on input (simple logic)
-            result = {
-                version: "1.0",
-                globalIntent: {
-                    classification: "input-control",
-                    uiIntent: {
-                        primaryPurpose: "collect-rating",
-                        visualStyle: "standard",
-                        dataBinding: "single-value"
-                    },
-                    behavior: {
-                        interactivity: "editable",
-                        validation: "required",
-                        persistence: "manual"
-                    },
-                    interaction: {
-                        inputMethod: ["mouse", "touch"],
-                        feedback: ["visual"]
-                    },
-                    accessibility: {
-                        wcagLevel: "AA",
-                        keyboardNavigable: true,
-                        screenReaderSupport: true,
-                        highContrastMode: true
-                    },
-                    responsiveness: {
-                        adaptiveLayout: true
-                    },
-                    constraints: {
-                        performanceTarget: "standard",
-                        offlineCapable: true,
-                        externalDependencies: []
-                    },
-                    componentType: "star-rating"
-                },
-                confidence: 0.99,
-                unmappedPhrases: [],
-                needsClarification: false
-            };
-            
-            console.log('✓ Mock response prepared');
+            console.error('❌ ERROR: OPENAI_API_KEY/GROK_API_KEY not found.');
+            throw new Error('API Key missing. Cannot interpret intent without valid API key.');
         } else {
             console.log('STEP 3: Calling OpenAI (Model: grok-4-fast)...');
             

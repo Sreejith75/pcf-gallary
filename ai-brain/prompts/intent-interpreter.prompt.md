@@ -131,6 +131,7 @@ Create a modern star rating component, compact, smooth hover animation, mobile f
 {
   "globalIntent": {
     "classification": "input-control",
+    "componentType": "star-rating",
     "uiIntent": {
       "primaryPurpose": "collect-rating",
       "visualStyle": "modern",
@@ -180,6 +181,7 @@ Make it premium looking, something nice
 {
   "globalIntent": {
     "classification": "input-control",
+    "componentType": "unknown",
     "uiIntent": {
       "visualStyle": "enterprise"
     }
@@ -202,7 +204,9 @@ Make this component viral on social media
 **Output:**
 ```json
 {
-  "globalIntent": {},
+  "globalIntent": {
+      "componentType": "unknown"
+  },
   "confidence": 0.22,
   "unmappedPhrases": ["viral", "social media"],
   "needsClarification": true
@@ -223,6 +227,7 @@ I need a rating control that works with screen readers and keyboard only, WCAG A
 {
   "globalIntent": {
     "classification": "input-control",
+    "componentType": "star-rating",
     "uiIntent": {
       "primaryPurpose": "collect-rating",
       "visualStyle": "standard",
@@ -272,6 +277,7 @@ Show average rating as stars, users shouldn't be able to change it
 {
   "globalIntent": {
     "classification": "display-control",
+    "componentType": "star-rating",
     "uiIntent": {
       "primaryPurpose": "display-value",
       "visualStyle": "standard",

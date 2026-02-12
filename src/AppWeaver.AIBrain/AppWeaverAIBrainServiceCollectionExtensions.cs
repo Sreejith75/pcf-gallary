@@ -54,6 +54,9 @@ public static class AppWeaverAIBrainServiceCollectionExtensions
         // Register build orchestrator
         services.AddScoped<Build.IBuildOrchestrator, Build.BuildOrchestrator>();
 
+        // Register storage service
+        services.AddScoped<Services.IComponentStorageService, Services.ComponentStorageService>();
+
         return services;
     }
 

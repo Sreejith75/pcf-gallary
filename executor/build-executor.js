@@ -290,21 +290,27 @@ function buildPcf(workingDir, componentName) {
         // PAC CLI (v1.x/v2.x) uses the folder name as the solution name by default.
         // We must name the folder exactly what we want the solution to be.
         const solutionName = `${controlName}_Solution`;
-        const solutionDir = path.join(workingDir, solutionName);
+        // FIX: Create solution folder BESIDE the project folder (sibling), not inside.
+        const solutionDir = path.resolve(workingDir, '..', solutionName);
         
         if (fs.existsSync(solutionDir)) {
             fs.rmSync(solutionDir, { recursive: true, force: true });
         }
         fs.mkdirSync(solutionDir);
 
-        const publisherName = 'Bytestrone';
-        const publisherPrefix = 'bts';
+        const publisherName = namespace;
+        // Prefix must be 2-8 chars, alphanumeric
+        let publisherPrefix = namespace.replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
+        if (publisherPrefix.length > 8) publisherPrefix = publisherPrefix.substring(0, 8);
+        if (publisherPrefix.length < 2) publisherPrefix = 'comp'; // fallback
 
         // a. Init Solution
         runCommand(`pac solution init --publisher-name ${publisherName} --publisher-prefix ${publisherPrefix}`, solutionDir);
 
         // b. Add Reference to Control
-        runCommand(`pac solution add-reference --path ..`, solutionDir);
+        // Since solution is sibling, path to control is just the folder name of workingDir
+        const controlDirName = path.basename(workingDir);
+        runCommand(`pac solution add-reference --path ../${controlDirName}`, solutionDir);
 
         // c.0 CRITICAL FIX: Patch .pcfproj to DISABLE PCF BUILD (Double Safety)
         // This ensures that when the solution build triggers the project, it does NOTHING.
@@ -370,26 +376,37 @@ function buildPcf(workingDir, componentName) {
         runCommand('dotnet restore', solutionDir);
         // Important: Solution build might trigger PCF build, but since we just built it,
         // incremental build logic should skip re-running pcf-scripts, preserving our cleanup.
-        runCommand('dotnet build', solutionDir);
+        // USE RELEASE BUILD - Force UNMANAGED solution output
+        runCommand('dotnet build -c Release /p:SolutionPackageType=Unmanaged', solutionDir);
 
 
         // STEP 4: Finalizing Artifact...
         console.log('\nSTEP 4: Finalizing Artifact...');
         
-        // Expected location: output/bin/Debug/{SolutionName}.zip
-        const binDebug = path.join(solutionDir, 'bin', 'Debug');
+        // Expected location: output/bin/Release/{SolutionName}.zip
+        const binRelease = path.join(solutionDir, 'bin', 'Release');
         
-        if (!fs.existsSync(binDebug)) {
-             throw new Error(`Solution build output directory not found: ${binDebug}`);
+        if (!fs.existsSync(binRelease)) {
+             throw new Error(`Solution build output directory not found: ${binRelease}`);
         }
 
         // Validate Solution ZIP was generated
-        const solutionZips = fs.readdirSync(binDebug).filter(f => f.endsWith('.zip'));
-        if (solutionZips.length === 0) {
+        // We specifically want the UNMANAGED solution (no _managed in name).
+        const allZips = fs.readdirSync(binRelease).filter(f => f.endsWith('.zip'));
+        
+        let targetZip = allZips.find(f => !f.includes('_managed.zip'));
+        
+        if (!targetZip && allZips.length > 0) {
+            // Fallback: If for some reason only managed exists (shouldn't happen with /p param), verify.
+            console.warn('! Unmanaged ZIP not found, checking for any ZIP...');
+            targetZip = allZips[0];
+        }
+
+        if (!targetZip) {
              throw new Error('No Solution ZIP found in build output');
         }
         
-        const sourceZip = path.join(binDebug, solutionZips[0]);
+        const sourceZip = path.join(binRelease, targetZip);
         console.log(`✓ Solution ZIP verified: ${sourceZip}`);
         
         // Target: {componentName}_{buildId}.zip

@@ -70,47 +70,49 @@ public class CreateComponentProcedure : IProcedureExecutor
 
             var intent = intentResult.Intent;
 
-            // STEP 2: Route Capability (Deterministic)
-            // Intent must map to a capability. For v1.0, we support 'star-rating'.
-            // In a full router, this logic is more complex. Here we check intent.ComponentType or specific constraints.
-            // For this implementation, we assume the intent implies a capability we can find.
-            // Let's use the router to find it based on the intent's classification or constraints.
-            // Simplified: The IntentInterpreter prompt guides classification to 'star-rating'.
+            // We use the capability ID from the intent.
+            // The GlobalIntent model now includes ComponentType which maps to the capability ID.
+            var capabilityId = intent.ComponentType;
             
-            // We use the capability ID from the intent (if present) or infer it.
-            // The validated GlobalIntent usually has a specific type? 
-            // The prompt/schema produced "componentType": "star-rating".
-            // Let's use intent.ComponentType if it exists in GlobalIntent model? 
-            // Checking GlobalIntent.cs earlier, it has `ComponentType`? 
-            // Actually, `IntentInterpreter` output `GlobalIntent` was validated against schema.
-            // Let's assume we can map intent to capability ID.
-            // For MVP, we pass "star-rating" if intent fits, or look it up.
-            // Let's assume the intent output has a classification field we can use.
-            
-            // Hardcoded lookup for MVP safety or usage of _router?
-            // _router.RouteAsync(BrainTask.LoadCapability...) requires capabilityId.
-            // We need to extract capabilityId from intent.
-            // Let's assume strict mapping: Intent.Interaction.InputMethod or similar?
-            // Actually, let's peek at GlobalIntent content again? The example showed "componentType": "star-rating" in the *Spec*.
-            // The *Intent* schema (global-intent.schema.json) might not have it explicitly as a top field?
-            // PROMPT said: "Generate a valid GlobalIntent... classification".
-            // My node adapter printed `Intent Classification: ${globalIntent.classification}`.
-            // I need to access that property from `GlobalIntent` C# model.
-            
-            // I'll proceed assuming there's a way to get CapabilityId.
-            // If GlobalIntent doesn't have it, I'll use a fast lookup or rely on router.
-            var capabilityId = "star-rating"; // Default for MVP test
+            if (string.IsNullOrEmpty(capabilityId))
+            {
+                BrainLogger.LogError(buildId, "Pipeline", "ComponentType missing in intent", null);
+                throw new InvalidOperationException("Intent interpretation failed to determine ComponentType/Capability.");
+            }
             
             // Load authoritative capability
-            var context = await _router.RouteAsync(
-                BrainTask.LoadCapability,
-                new Dictionary<string, string> { ["capabilityId"] = capabilityId },
-                cancellationToken);
+            IBrainContext context = null;
+            ComponentCapability capability = null;
 
-            var capability = context.GetArtifact<ComponentCapability>("capability");
+            try
+            {
+                context = await _router.RouteAsync(
+                    BrainTask.LoadCapability,
+                    new Dictionary<string, string> { ["capabilityId"] = capabilityId },
+                    cancellationToken);
+                    
+                capability = context.GetArtifact<ComponentCapability>("capability");
+            }
+            catch (FileNotFoundException)
+            {
+                BrainLogger.LogOperation(buildId, "Pipeline", $"Capability '{capabilityId}' not found (exception), falling back to 'generic'", 0);
+                capability = null;
+            }
+
             if (capability == null)
             {
-                throw new InvalidOperationException($"Capability '{capabilityId}' not found.");
+                // Fallback to generic capability
+                var genericContext = await _router.RouteAsync(
+                    BrainTask.LoadCapability,
+                    new Dictionary<string, string> { ["capabilityId"] = "generic" },
+                    cancellationToken);
+                    
+                capability = genericContext.GetArtifact<ComponentCapability>("capability");
+                
+                if (capability == null)
+                {
+                    throw new InvalidOperationException($"Capability '{capabilityId}' not found and 'generic' fallback failed.");
+                }
             }
 
             // STEP 3: Generate Spec (AI -> C# Authority)

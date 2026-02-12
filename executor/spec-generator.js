@@ -70,37 +70,8 @@ async function generateSpec(inputJson, brainPath) {
         let result;
 
         if (!apiKey) {
-            console.warn('⚠️ WARNING: OPENAI_API_KEY not found. Using MOCK response for testing.');
-            
-            // Mock Spec
-            result = {
-                version: "1.0",
-                componentType: "star-rating",
-                componentName: "StarRating",
-                namespace: "Contoso",
-                displayName: "Star Rating",
-                description: "A modern star rating component with hover effects.",
-                capabilities: {
-                    capabilityId: "star-rating",
-                    features: ["rating-display", "click-to-rate", "hover-effect"],
-                    customizations: { color: "#FFD700" }
-                },
-                properties: [
-                    { name: "value", displayName: "Value", dataType: "Whole.None", usage: "bound", required: true, description: "The current rating value." },
-                    { name: "maxRating", displayName: "Max Rating", dataType: "Whole.None", usage: "input", required: false, description: "Maximum number of stars." }
-                ],
-                resources: {
-                    code: "index.ts",
-                    css: ["css/StarRating.css"],
-                    resx: ["strings/StarRating.resx"]
-                },
-                validation: {
-                    rulesApplied: ["pcf-naming", "accessibility-check"],
-                    warnings: [],
-                    downgrades: []
-                }
-            };
-            console.log('✓ Mock response prepared');
+            console.error('❌ ERROR: OPENAI_API_KEY/GROK_API_KEY not found.');
+            throw new Error('API Key missing. Cannot generate spec without valid API key.');
         } else {
             console.log('STEP 3: Calling OpenAI (Model: grok-4-fast)...');
             

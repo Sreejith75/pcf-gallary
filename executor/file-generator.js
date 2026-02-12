@@ -43,29 +43,8 @@ function generateFiles(input, outputDir, templatesDir) {
             throw new Error('Invalid fileGenerationPlan: steps array missing');
         }
 
-        // FIX: Inject Preview System files into the plan
-        // The C# orchestrator might not know about these new files yet.
-        const previewSteps = [
-            {
-                templateName: 'Control.tsx.hbs',
-                outputPath: `${componentSpec.componentName}View.tsx`, 
-                order: 90
-            },
-            {
-                templateName: 'preview.tsx.hbs',
-                outputPath: 'preview.tsx',
-                order: 91
-            }
-        ];
+        // Preview steps are now included in the C# FileGenerationPlan.
         
-        // Remove existing entries if they exist to avoid duplicates (defensive)
-        fileGenerationPlan.steps = fileGenerationPlan.steps.filter(s => 
-            s.outputPath !== 'preview.tsx' && !s.outputPath.endsWith('View.tsx')
-        );
-        
-        fileGenerationPlan.steps.push(...previewSteps);
-        console.log('! Injected Preview System files into Generation Plan');
-
         console.log(`Component: ${componentSpec.componentName} (${componentSpec.componentType})`);
         console.log(`Plan: ${fileGenerationPlan.steps.length} files to generate`);
         console.log(`Output: ${outputDir}\n`);

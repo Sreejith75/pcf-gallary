@@ -1,0 +1,33 @@
+{
+    "capabilityId": "generic",
+    "displayName": "Generic Component",
+    "description": "Baseline capability for generic components.",
+    "classification": "utility-control",
+    "supportedFeatures": [
+        {
+            "featureId": "visualization",
+            "name": "Visualization",
+            "description": "Basic visual rendering",
+            "required": true,
+            "configurable": true
+        },
+        {
+            "featureId": "interaction",
+            "name": "Interaction",
+            "description": "Basic user interaction",
+            "required": false,
+            "configurable": true
+        }
+    ],
+    "limits": {
+        "maxSize": "5MB",
+        "complexity": "medium"
+    },
+    "visual": {
+        "defaultStyle": "standard",
+        "supportedThemes": [
+            "light",
+            "dark"
+        ]
+    }
+}

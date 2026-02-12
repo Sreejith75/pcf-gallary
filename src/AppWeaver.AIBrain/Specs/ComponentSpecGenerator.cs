@@ -51,7 +51,17 @@ public class ComponentSpecGenerator : IComponentSpecGenerator
             BrainLogger.LogOperation(buildId, "GenerateComponentSpec", "RawOutput", 0, metadata: new { content = jsonContent });
 
             // STEP 3: Validate JSON Structural Integrity & Contract
-            var spec = DeserializeAndValidateStructure(jsonContent);
+            var rawSpec = DeserializeAndValidateStructure(jsonContent);
+
+            // AUTO-FIX: Enforce uniqueness to avoid "Already created by another publisher" errors during dev/test cycles.
+            // We append a random 6-char suffix to the ComponentName.
+            // MUST BE PascalCase (no underscores allowed).
+            var suffix = Guid.NewGuid().ToString("N").Substring(0, 6).ToUpperInvariant();
+            var spec = rawSpec with 
+            { 
+                ComponentName = $"{rawSpec.ComponentName}{suffix}",
+                DisplayName = $"{rawSpec.DisplayName} ({suffix})"
+            };
 
             // STEP 4: Validate Contract Version
             ValidateContractVersion(spec);
@@ -258,7 +268,9 @@ public class ComponentSpecGenerator : IComponentSpecGenerator
     private void ValidateCapability(ComponentSpec spec, ComponentCapability capability)
     {
         // 1. Component Type Match
-        if (!string.Equals(spec.ComponentType, capability.CapabilityId, StringComparison.OrdinalIgnoreCase))
+        // Allow mismatch if capability is "generic" (fallback scenario)
+        if (!string.Equals(capability.CapabilityId, "generic", StringComparison.OrdinalIgnoreCase) && 
+            !string.Equals(spec.ComponentType, capability.CapabilityId, StringComparison.OrdinalIgnoreCase))
         {
             throw new CapabilityViolationException(
                 $"ComponentType '{spec.ComponentType}' does not match CapabilityId '{capability.CapabilityId}'.");

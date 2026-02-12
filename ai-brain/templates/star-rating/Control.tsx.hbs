@@ -1,0 +1,36 @@
+import * as React from 'react';
+
+export interface I{{componentName}}Props {
+value?: number;
+maxValue?: number;
+onChange?: (value: number) => void;
+disabled?: boolean;
+}
+
+export const {{componentName}}View: React.FC<I{{componentName}}Props> = (props) => {
+    const [hoverValue, setHoverValue] = React.useState<number | null>(null);
+        const max = props.maxValue || 5;
+        const current = props.value || 0;
+
+        const handleClick = (val: number) => {
+        if (!props.disabled && props.onChange) {
+        props.onChange(val);
+        }
+        };
+
+        return (
+        <div className="{{componentName}}-container">
+            {[...Array(max)].map((_, i) => {
+            const ratingValue = i + 1;
+            const isActive = ratingValue <= (hoverValue || current); return ( <span key={i} className={`star ${isActive
+                ? 'active' : '' } ${props.disabled ? 'disabled' : '' }`} onClick={()=> handleClick(ratingValue)}
+                onMouseEnter={() => !props.disabled && setHoverValue(ratingValue)}
+                onMouseLeave={() => !props.disabled && setHoverValue(null)}
+                >
+                ★
+                </span>
+                );
+                })}
+        </div>
+        );
+        };

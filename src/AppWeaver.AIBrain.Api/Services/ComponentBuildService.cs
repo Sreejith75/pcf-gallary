@@ -3,6 +3,7 @@ using AppWeaver.AIBrain.Api.Models;
 using AppWeaver.AIBrain.Abstractions;
 using AppWeaver.AIBrain.Logging;
 using Microsoft.Extensions.DependencyInjection;
+using AppWeaver.AIBrain.Services;
 
 namespace AppWeaver.AIBrain.Api.Services;
 
@@ -47,19 +48,23 @@ public class ComponentBuildService
             {
                 using var scope = _scopeFactory.CreateScope();
                 var procedure = scope.ServiceProvider.GetRequiredService<IProcedureExecutor>();
+                var storage = scope.ServiceProvider.GetRequiredService<IComponentStorageService>();
 
                 var result = await procedure.ExecuteCreateComponentAsync(prompt);
                 
+                // Store artifact persistently
+                var storedPath = await storage.StoreArtifactAsync(trackingId, result.ZipPath, result.ComponentSpec);
+
                 // Update state
                 state.Status = "Completed";
-                state.ZipPath = result.ZipPath;
+                state.ZipPath = storedPath;
                 // Preview URL: /preview/{buildId}/index.html
                 // Base URL is relative to API root for now, or full URL if domain known.
                 // Since frontend calls API, relative is fine if proxied, but absolute is safer for direct use.
                 // We'll rely on relative path from API root: /preview/buildId/index.html
                 state.PreviewUrl = $"/preview/{result.BuildId}/index.html";
                 
-                BrainLogger.LogOperation(trackingId, "ApiCreateComponent", "Completed", 0, metadata: new { zip = result.ZipPath, internalBuildId = result.BuildId, preview = state.PreviewUrl });
+                BrainLogger.LogOperation(trackingId, "ApiCreateComponent", "Completed", 0, metadata: new { zip = storedPath, internalBuildId = result.BuildId, preview = state.PreviewUrl });
             }
             catch (Exception ex)
             {

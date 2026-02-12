@@ -6,6 +6,7 @@
     "type": "object",
     "required": [
         "classification",
+        "componentType",
         "uiIntent",
         "interaction"
     ],
@@ -22,6 +23,10 @@
                 "utility-control"
             ],
             "description": "High-level component category"
+        },
+        "componentType": {
+            "type": "string",
+            "description": "Specific component type (e.g., star-rating, text-input, toggle, slider). Use 'unknown' if unsure."
         },
         "uiIntent": {
             "type": "object",

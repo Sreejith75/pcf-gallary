@@ -28,10 +28,17 @@ async function main() {
         }
 
         // 1. Locate Control
-        // We know structure is out/controls/<Namespace>.<ControlName>/
-        const controlsDir = path.join(buildDir, 'out/controls');
+        // Check "out/controls" (Standard Build) OR "Controls" (Unmanaged Solution Extract)
+        let controlsDir = path.join(buildDir, 'out/controls');
+        
         if (!fs.existsSync(controlsDir)) {
-             throw new Error(`Controls directory not found: ${controlsDir}`);
+            const altControlsDir = path.join(buildDir, 'Controls');
+            if (fs.existsSync(altControlsDir)) {
+                controlsDir = altControlsDir;
+                console.log(`✓ Located controls directory at: ${controlsDir}`);
+            } else {
+                 throw new Error(`Controls directory not found at ${controlsDir} or ${altControlsDir}`);
+            }
         }
 
         const controlFolders = fs.readdirSync(controlsDir).filter(f => fs.statSync(path.join(controlsDir, f)).isDirectory());
@@ -127,6 +134,7 @@ function generateRuntime(namespace, constructorName, properties) {
             switch(p.type) {
                 case 'Whole.None': mockState[p.name] = 0; break;
                 case 'TwoOptions': mockState[p.name] = false; break;
+                case 'MultiSelectOptionSet': mockState[p.name] = []; break;
                 case 'SingleLine.Text': mockState[p.name] = "Sample Text"; break;
                 default: mockState[p.name] = null;
             }

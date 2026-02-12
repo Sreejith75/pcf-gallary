@@ -1,0 +1,87 @@
+import {IInputs, IOutputs} from "./generated/ManifestTypes";
+import * as React from "react";
+import * as ReactDOM from "react-dom";
+import { {{componentName}}View, I{{componentName}}Props } from "./{{componentName}}View";
+
+export class {{componentName}} implements ComponentFramework.StandardControl<IInputs, IOutputs> {
+
+    private _container: HTMLDivElement;
+    private _notifyOutputChanged: () => void;
+    private _props: I{{componentName}}Props = {
+    {{#each properties}}
+    {{name}}: undefined,
+    {{/each}}
+    };
+
+    /**
+    * Empty constructor.
+    */
+    constructor()
+    {
+
+    }
+
+    /**
+    * Used to initialize the control instance.
+    */
+    public init(context: ComponentFramework.Context<IInputs>, notifyOutputChanged: () => void, state:
+        ComponentFramework.Dictionary, container:HTMLDivElement): void
+        {
+        this._notifyOutputChanged = notifyOutputChanged;
+        this._container = container;
+        this._props.onChange = this.onChange.bind(this);
+        this.updateProps(context);
+        this.render();
+        }
+
+        /**
+        * Called when any value in the property bag has changed.
+        */
+        public updateView(context: ComponentFramework.Context<IInputs>): void
+            {
+            this.updateProps(context);
+            this.render();
+            }
+
+            /**
+            * It is called by the framework prior to a control receiving new data.
+            */
+            public getOutputs(): IOutputs
+            {
+            return {
+            {{#each properties}}
+            {{#if (eq usage "bound")}}
+            {{name}}: this._props.{{name}} as any,
+            {{/if}}
+            {{/each}}
+            };
+            }
+
+            /**
+            * Called when the control is to be removed from the DOM tree.
+            */
+            public destroy(): void
+            {
+            ReactDOM.unmountComponentAtNode(this._container);
+            }
+
+            private updateProps(context: ComponentFramework.Context<IInputs>): void {
+                {{#each properties}}
+                // @ts-ignore
+                this._props.{{name}} = context.parameters.{{name}}.raw as any;
+                {{/each}}
+                }
+
+                private onChange(prop: string, value: any): void {
+                // @ts-ignore
+                this._props[prop] = value;
+                this._notifyOutputChanged();
+                }
+
+                private render(): void {
+                ReactDOM.render(
+                React.createElement({{componentName}}View, this._props),
+                this._container
+                );
+                }
+                }

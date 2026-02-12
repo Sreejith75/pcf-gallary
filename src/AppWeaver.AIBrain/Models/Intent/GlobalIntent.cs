@@ -15,6 +15,12 @@ public record GlobalIntent
     public required string Classification { get; init; }
 
     /// <summary>
+    /// Specific component type identifier (e.g., "star-rating", "text-input").
+    /// </summary>
+    [JsonPropertyName("componentType")]
+    public required string ComponentType { get; init; }
+
+    /// <summary>
     /// UI intent details.
     /// </summary>
     [JsonPropertyName("uiIntent")]

@@ -1,0 +1,89 @@
+import {IInputs, IOutputs} from "./generated/ManifestTypes";
+import * as React from "react";
+import * as ReactDOM from "react-dom";
+import { {{componentName}}View, I{{componentName}}Props } from "./{{componentName}}View";
+
+export class {{componentName}} implements ComponentFramework.StandardControl<IInputs, IOutputs> {
+
+    private _container: HTMLDivElement;
+    private _notifyOutputChanged: () => void;
+    private _value: number;
+    private _props: I{{componentName}}Props = {
+    value: 0,
+    maxValue: 5,
+    disabled: false
+    };
+
+    /**
+    * Empty constructor.
+    */
+    constructor()
+    {
+
+    }
+
+    /**
+    * Used to initialize the control instance.
+    */
+    public init(context: ComponentFramework.Context<IInputs>, notifyOutputChanged: () => void, state:
+        ComponentFramework.Dictionary, container:HTMLDivElement): void
+        {
+        this._notifyOutputChanged = notifyOutputChanged;
+        this._container = container;
+
+        // Dynamic property binding based on convention (Value should act as the bound field)
+        // If the spec defines different names, we might need a more dynamic approach or standard contract.
+        // For StarRating capability, we EXPECT a property named 'Value'.
+        this._value = context.parameters.Value?.raw || 0;
+
+        this._props.onChange = this.onChange.bind(this);
+        this.updateProps(context);
+        this.render();
+        }
+
+        /**
+        * Called when any value in the property bag has changed.
+        */
+        public updateView(context: ComponentFramework.Context<IInputs>): void
+            {
+            this._value = context.parameters.Value?.raw || 0;
+            this.updateProps(context);
+            this.render();
+            }
+
+            /**
+            * It is called by the framework prior to a control receiving new data.
+            */
+            public getOutputs(): IOutputs
+            {
+            return {
+            Value: this._value
+            };
+            }
+
+            /**
+            * Called when the control is to be removed from the DOM tree.
+            */
+            public destroy(): void
+            {
+            ReactDOM.unmountComponentAtNode(this._container);
+            }
+
+            private updateProps(context: ComponentFramework.Context<IInputs>): void {
+                this._props.value = this._value;
+                this._props.maxValue = 5; // Default or bound
+                this._props.disabled = context.mode.isControlDisabled;
+                }
+
+                private onChange(newValue: number): void {
+                this._value = newValue;
+                this._notifyOutputChanged();
+                }
+
+                private render(): void {
+                ReactDOM.render(
+                React.createElement({{componentName}}View, this._props),
+                this._container
+                );
+                }
+                }
